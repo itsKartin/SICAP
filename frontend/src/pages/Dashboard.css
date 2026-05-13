@@ -1,0 +1,61 @@
+.dashboard-container {
+  min-height: 100vh;
+  background-color: #000000;
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  padding: 50px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.dashboard-header h1 {
+  font-weight: 300;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  font-size: 22px;
+  color: #aaaaaa;
+}
+
+/* La tarjeta donde se mostrará si está solvente o no */
+.status-card {
+  background-color: #111111;
+  border: 1px solid #222222;
+  border-radius: 16px;
+  padding: 40px;
+  text-align: center;
+  width: 100%;
+  max-width: 450px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.status-label {
+  font-size: 12px;
+  color: #888888;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 15px;
+}
+
+/* Estatus con color tipo luz LED */
+.status-value {
+  font-size: 36px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.status-value.solvente {
+  color: #00ff88; /* Un verde neón sutil */
+  text-shadow: 0 0 15px rgba(0, 255, 136, 0.3); /* Brillo tipo LED */
+}
+
+.status-value.deudor {
+  color: #ff3333; /* Rojo alerta */
+  text-shadow: 0 0 15px rgba(255, 51, 51, 0.3);
+}
