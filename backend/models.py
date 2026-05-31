@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, Float, ForeignKey, Enum, Date
+from sqlalchemy import Column, Integer, String, Boolean, Float, ForeignKey, Enum, Date, DateTime
 from sqlalchemy.orm import relationship
 from .database import Base
 
@@ -10,6 +10,7 @@ class Owner(Base):
     last_name = Column(String(50), nullable=False)
     email = Column(String(100), nullable=False, unique=True)
     phone = Column(String(20), nullable=False)
+    apartment = Column(String(10), nullable=False)
     status = Column(Enum("active", "inactive"), nullable=False, default="active")
     password = Column(String(100), nullable=False)
     monthly_fee = Column(Float, nullable=False)
@@ -45,3 +46,11 @@ class Admin(Base):
     password = Column(String (250), nullable=False)
     full_name = Column(String(100), nullable=False)
     email = Column(String (100), nullable=False)
+
+class Incident(Base):
+    __tablename__ = 'incidents'
+    id = Column(Integer, primary_key=True)
+    admin_id = Column(ForeignKey("administrators.id"), nullable=False)
+    description = Column(String(500), nullable=False)
+    opened_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, nullable=False)
