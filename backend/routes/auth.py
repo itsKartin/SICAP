@@ -19,8 +19,11 @@ def get_db():
 @router.post("/login")
 def login(email:str, password:str, db: Session = Depends(get_db)):
     user = db.query(Owner).filter(Owner.email == email).first()
+
     if not user:
         raise HTTPException(status_code=401, detail="Invalid credentials")
+    
     if not verify_password(password, user.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
+    
     return {"access_token": create_token({"id":user.id, "email": user.email})}

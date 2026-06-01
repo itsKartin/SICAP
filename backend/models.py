@@ -1,5 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, Float, ForeignKey, Enum, Date, DateTime
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, Enum, Date, DateTime
 from .database import Base
 
 class Owner(Base):
@@ -10,11 +9,13 @@ class Owner(Base):
     last_name = Column(String(50), nullable=False)
     email = Column(String(100), nullable=False, unique=True)
     phone = Column(String(20), nullable=False)
+    ci = Column(String(10), nullable=False, unique=True)
     apartment = Column(String(10), nullable=False)
+    floor = Column(String(10), nullable=False)
+    tower = Column(String(10), nullable=False)
     status = Column(Enum("active", "inactive"), nullable=False, default="active")
     password = Column(String(100), nullable=False)
     monthly_fee = Column(Float, nullable=False)
-    month_unpaid = Column(Integer)
 
 class MonthlyDue(Base):
     __tablename__ = 'dues'
