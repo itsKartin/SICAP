@@ -1,0 +1,45 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "email": "vecino@narayola.com",
+      "password": "password123",
+      "name": "Juan Pérez",
+      "status": "Solvente"
+    },
+    {
+      "name": "Carlos Lugo",
+      "email": "example@gmail.com",
+      "password": "excel123",
+      "status": "Solvente",
+      "id": "vX240_aJJOs"
+    },
+    {
+      "nombres": "Giuseppe",
+      "apellidos": "Papa",
+      "cedula": "31358151",
+      "telefono": "04243556555",
+      "torre": "2",
+      "piso": "1",
+      "apartamento": "1",
+      "email": "papa57886@gmail.com",
+      "password": "giuseppe123",
+      "status": "Solvente",
+      "id": "V5zU5ULb854"
+    },
+    {
+      "nombres": "Carlos",
+      "apellidos": "Lugo",
+      "cedula": "12345678",
+      "telefono": "04144643254",
+      "torre": "2",
+      "piso": "1",
+      "apartamento": "1",
+      "email": "lugo@gmail.com",
+      "password": "lugo123",
+      "status": "Solvente",
+      "id": "WnItuMwG2NI"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}

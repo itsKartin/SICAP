@@ -1,0 +1,142 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+.dashboard-container {
+  width: 100%;
+  max-width: 400px; /* Tamaño móvil sugerido */
+  margin: 0 auto;
+  min-height: 100vh;
+  background-color: #16181b; /* Color oscuro del fondo inferior */
+  color: #ffffff;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- SECCIÓN SUPERIOR --- */
+/* ¡CORRECCIÓN AQUÍ! Se eliminó background-image y se añadió background: linear-gradient */
+.dashboard-top-section {
+  /* Este degradado va de negro (#16181b) a un verde azulado muy oscuro (#0d4036) */
+  background: linear-gradient(180deg, #16181b 0%, #0d4036 100%);
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 30px;
+}
+
+.header-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+  letter-spacing: 0.5px;
+}
+
+.header-status {
+  color: #02d47d; /* Verde vibrante */
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.header-actions {
+  display: flex;
+  gap: 16px;
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gate-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 20px;
+}
+
+.gate-image {
+  max-width: 85%;
+  height: auto;
+  display: block;
+}
+
+/* --- SECCIÓN DEL MENÚ --- */
+.dashboard-menu {
+  padding: 10px 20px 30px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px; /* Espaciado entre items */
+  flex-grow: 1;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.menu-icon {
+  color: #9ba0a6;
+  margin-right: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-content {
+  flex-grow: 1;
+}
+
+.menu-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+}
+
+.menu-subtitle {
+  font-size: 13px;
+  color: #7b7f87;
+  margin: 0;
+  font-weight: 400;
+}
+
+.menu-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- FOOTER --- */
+.dashboard-footer {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  padding-bottom: 40px;
+}
+
+.settings-button {
+  background: none;
+  border: none;
+  color: #9ba0a6;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.settings-button:hover {
+  color: #ffffff;
+}
