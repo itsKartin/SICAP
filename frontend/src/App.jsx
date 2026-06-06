@@ -1,19 +1,26 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
+import React, { useState } from 'react';
+import Auth from './components/Auth';
+import DashboardUser from './components/user/DashboardUser';
+
 
 function App() {
+  // Guardamos los datos del usuario logueado. Si es null, mostramos el Login.
+  const [user, setUser] = useState(null);
+
+  const handleLoginSuccess = (userData) => {
+    setUser(userData);
+  };
+
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* La ruta principal '/' mostrará el Login */}
-        <Route path="/" element={<Login />} />
-        
-        {/* La ruta '/dashboard' mostrará el panel principal */}
-        <Route path="/dashboard" element={<Dashboard />} />
-      </Routes>
-    </BrowserRouter>
+    <div className="app-container">
+      {user ? (
+        // Si hay usuario, renderiza el Dashboard (puedes pasarle los datos del usuario si quieres)
+        <DashboardUser user={user} />
+      ) : (
+        // Si no hay usuario, muestra la pantalla de Login/Registro
+        <Auth onLoginSuccess={handleLoginSuccess} />
+      )}
+    </div>
   );
 }
 
