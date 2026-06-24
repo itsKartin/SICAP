@@ -1,0 +1,120 @@
+/* Contenedor principal de toda la vista */
+.admin-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #000000;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* Área central que contiene la barra lateral y el contenido principal */
+.admin-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Barra de navegación lateral (Ajustado el ancho a 220px) */
+.admin-sidebar {
+  width: 220px; 
+  background-color: #111111;
+  color: #888888;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2.5rem 1.5rem;
+}
+
+/* Lista de navegación */
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem; /* Reducido el espacio entre items */
+}
+
+/* Enlaces de navegación */
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  text-decoration: none;
+  color: inherit;
+  font-size: 0.85rem; /* Letra un poco más pequeña */
+  transition: color 0.2s ease-in-out;
+}
+
+.nav-link:hover {
+  color: #ffffff;
+}
+
+.nav-link.active {
+  color: #ffffff;
+  font-weight: 500;
+}
+
+/* Botón de Exportar */
+.export-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.4rem 0.8rem; /* Botón más compacto */
+  background-color: #222222;
+  color: #ffffff;
+  border-radius: 1rem;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  width: max-content;
+  font-size: 0.85rem;
+}
+
+.export-btn:hover {
+  background-color: #333333;
+  border-color: #4b5563;
+}
+
+.export-text {
+  font-weight: 500;
+}
+
+.export-icon-wrapper {
+  background-color: #ffffff;
+  color: #000000;
+  border-radius: 50%;
+  padding: 0.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Área principal */
+.admin-main {
+  flex: 1;
+  background-color: #000000;
+}
+
+/* Footer (Barra inferior con el logo) */
+.admin-footer {
+  height: 55px; /* Barra inferior un poco más delgada */
+  background: linear-gradient(to top, #000000, #151515);
+  border-top: 1px solid #222222;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.admin-logo {
+  height: 1.2rem; /* Logo ligeramente más pequeño */
+  object-fit: contain;
+  opacity: 0.9;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.admin-logo:hover {
+  opacity: 1;
+}

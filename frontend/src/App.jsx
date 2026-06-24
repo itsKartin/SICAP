@@ -1,26 +1,54 @@
-import React, { useState } from 'react';
-import Auth from './components/Auth';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+
+// Importamos los componentes del Administrador
+import AdminNav from './components/admin/AdminNav';
+import HomeScreen from './components/admin/HomeScreen';
+import AdminTowers from './components/admin/AdminTowers';
+import AdminPropietarios from './components/admin/AdminPropietarios';
+import AdminPagos from './components/admin/AdminPagos';
+import Bloqueados from './components/admin/Bloqueados';
+
+// Importamos el componente de Usuario
 import DashboardUser from './components/user/DashboardUser';
 
-
 function App() {
-  // Guardamos los datos del usuario logueado. Si es null, mostramos el Login.
-  const [user, setUser] = useState(null);
-
-  const handleLoginSuccess = (userData) => {
-    setUser(userData);
-  };
-
   return (
-    <div className="app-container">
-      {user ? (
-        // Si hay usuario, renderiza el Dashboard (puedes pasarle los datos del usuario si quieres)
-        <DashboardUser user={user} />
-      ) : (
-        // Si no hay usuario, muestra la pantalla de Login/Registro
-        <Auth onLoginSuccess={handleLoginSuccess} />
-      )}
-    </div>
+    <Router>
+      <div className="app-container" style={{ display: 'flex', flexDirection: 'column', gap: '50px' }}>
+        
+        {/* SECCIÓN DE ADMINISTRADOR (ARRIBA) - CON RUTAS ACTIVAS */}
+        <div className="admin-workspace-section" style={{ borderBottom: '3px dashed #222', paddingBottom: '40px' }}>
+          <div style={{ color: '#666', fontSize: '12px', letterSpacing: '2px', padding: '10px 40px', fontWeight: 'bold' }}>
+            ENTORNO DE DESARROLLO: MÓDULO ADMINISTRATIVO (NAVEGACIÓN ACTIVA)
+          </div>
+          
+          <Routes>
+            {/* Si entras a la raíz "/" te redirige automáticamente a las torres o al home del admin */}
+            <Route path="/" element={<Navigate to="/admin/home" replace />} />
+
+            {/* Configuración de rutas anidadas para el Administrador */}
+            <Route path="/admin" element={<AdminNav />}>
+              <Route index element={<Navigate to="home" replace />} />
+              <Route path="home" element={<HomeScreen />} />
+              <Route path="torres" element={<AdminTowers />} />
+              <Route path="torres/:towerId" element={<AdminPropietarios />} />
+              <Route path="pagos" element={<AdminPagos />} />
+              <Route path="bloqueados" element={<Bloqueados />} />
+            </Route>
+          </Routes>
+        </div>
+
+        {/* SECCIÓN DE USUARIO (ABAJO) - ESTÁTICA PARA MONITOREO */}
+        <div className="user-workspace-section" style={{ paddingTop: '20px' }}>
+          <div style={{ color: '#666', fontSize: '12px', letterSpacing: '2px', padding: '10px 40px', fontWeight: 'bold' }}>
+            ENTORNO DE DESARROLLO: MÓDULO DE USUARIO (FIJO)
+          </div>
+          <DashboardUser />
+        </div>
+
+      </div>
+    </Router>
   );
 }
 

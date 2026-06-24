@@ -1,0 +1,326 @@
+/* Contenedor principal del módulo de pagos */
+.admin-pagos-container {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 30px;
+  padding: 20px 40px 20px 20px;
+  color: #ffffff;
+  font-family: sans-serif;
+  box-sizing: border-box;
+}
+
+/* --- COLUMNA PRINCIPAL (IZQUIERDA) --- */
+.pagos-main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* Fila de las tarjetas superiores */
+.pagos-cards-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* Estilos compartidos para las tarjetas */
+.pagos-card {
+  border-radius: 12px;
+  padding: 24px;
+}
+
+/* Tarjeta 1: Recaudado (Fondo transparente/oscuro) */
+.card-recaudado {
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.card-subtitle {
+  font-size: 16px;
+  margin: 0;
+  font-weight: 500;
+}
+
+.card-sub-date {
+  font-size: 14px;
+  color: #888;
+  margin: 4px 0 16px 0;
+}
+
+.price-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.card-price {
+  font-size: 36px;
+  font-weight: 500;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+.icon-btn-sort {
+  background-color: #2a2a2a;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: pointer;
+}
+
+/* Barra de progreso de la Tarjeta 1 */
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+  width: 100%;
+}
+
+.progress-bar-segment {
+  height: 4px;
+  background-color: #4ade80; /* Verde claro */
+}
+
+.segment-1 { width: 30%; }
+.segment-2 { width: 30%; }
+.segment-3 { width: 30%; }
+
+.progress-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid #4ade80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: bold;
+  background-color: #000;
+  margin-left: -10px; /* Para solaparse levemente con la línea */
+  z-index: 2;
+}
+
+/* Tarjeta 2: Usuarios (Fondo gris oscuro degradado) */
+.card-usuarios {
+  background: linear-gradient(135deg, #1a1a1a 0%, #111 100%);
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+
+.usuarios-text {
+  z-index: 2;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.card-subtitle-gray {
+  font-size: 13px;
+  color: #888;
+  margin: 4px 0 16px 0;
+}
+
+.card-percentage {
+  font-size: 36px;
+  font-weight: 500;
+  margin: 0 0 8px 0;
+}
+
+.card-growth-text {
+  font-size: 11px;
+  color: #4ade80;
+  margin: 0;
+}
+
+.usuarios-chart {
+  position: absolute;
+  right: 0;
+  top: 20%;
+  width: 55%;
+  height: 80%;
+  opacity: 0.8;
+}
+
+.chart-svg {
+  width: 100%;
+  height: 100%;
+}
+
+
+/* --- SECCIÓN DE TABLA --- */
+.pagos-table-section {
+  background-color: #252525;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background-color: #2a2a2a;
+}
+
+.table-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.table-filters {
+  display: flex;
+  gap: 12px;
+}
+
+.filter-dropdown {
+  background-color: #333;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: #ccc;
+}
+
+.table-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #333;
+  font-size: 14px;
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.row-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.row-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: #555;
+}
+
+.row-name {
+  font-weight: 500;
+}
+
+.row-cell {
+  text-align: left;
+}
+
+
+/* --- COLUMNA DERECHA (PENDIENTES) --- */
+.pagos-sidebar-right {
+  display: flex;
+  flex-direction: column;
+}
+
+.pendientes-title {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0 0 20px 0;
+}
+
+.pendientes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pendiente-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-radius: 24px; /* Bordes muy redondeados como en el diseño */
+  background-color: #1a1a1a;
+  border: 1px solid #2a2a2a;
+}
+
+.active-card {
+  opacity: 1;
+}
+
+/* Para simular el desvanecido inferior de la imagen */
+.faded-card {
+  opacity: 0.4;
+}
+
+.pendiente-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pendiente-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: #008080; /* Color de fondo si la imagen tiene transparencias */
+}
+
+.pendiente-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pendiente-name {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.pendiente-role {
+  margin: 0;
+  font-size: 11px;
+  color: #888;
+}
+
+.btn-more {
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.btn-more:hover {
+  background-color: #333;
+}

@@ -1,0 +1,153 @@
+/* Contenedor principal */
+.ap-container {
+  background-color: #000000;
+  min-height: 100vh;
+  padding: 40px;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+/* Cabecera */
+.ap-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.ap-back-btn {
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0;
+  letter-spacing: 1px;
+}
+
+.ap-back-btn:hover {
+  color: #cccccc;
+}
+
+.ap-header-placeholder {
+  width: 120px;
+  height: 36px;
+  background-color: #1a1a1a;
+  border-radius: 4px;
+}
+
+/* Estructura principal: Layout dividido */
+.ap-main-content {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+/* Cuadrícula de casas (Izquierda) */
+.ap-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 20px;
+}
+
+.ap-house-card {
+  background-color: #141414;
+  border-radius: 8px;
+  padding: 20px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.ap-house-card:hover {
+  background-color: #1a1a1a;
+}
+
+/* Estado activo para mostrar cuál casa está seleccionada */
+.ap-house-card.active {
+  border-color: #555555;
+  background-color: #1a1a1a;
+}
+
+.ap-house-img {
+  width: 100%;
+  max-width: 90px;
+  object-fit: contain;
+  margin-bottom: 15px;
+}
+
+.ap-house-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  padding-left: 10px;
+}
+
+.ap-house-apto, .ap-house-name {
+  color: #cccccc;
+  font-size: 10px;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+/* Panel lateral (Derecha) */
+.ap-sidebar {
+  width: 400px;
+  background-color: #111111;
+  border-radius: 12px;
+  padding: 40px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ap-sidebar-avatar-container {
+  width: 120px;
+  height: 120px;
+  background-color: #8fa0c0; /* Color de fondo del placeholder circular */
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 30px;
+  overflow: hidden;
+}
+
+.ap-sidebar-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ap-sidebar-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 30px;
+  color: #ffffff;
+}
+
+/* Detalles del residente (Líneas con borde inferior) */
+.ap-sidebar-details {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.ap-detail-row {
+  border-bottom: 1px solid #444444;
+  padding-bottom: 8px;
+  width: 100%;
+}
+
+.ap-detail-text {
+  color: #eeeeee;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+}
