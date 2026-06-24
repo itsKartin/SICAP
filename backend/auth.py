@@ -1,13 +1,16 @@
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from jose import jwt 
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 
-SECRET_KEY = "changethis"
+SECRET_KEY = os.getenv("TOKENKEY")
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_MINUTES = 30
 
-pass_context= CryptContext(schemes=["bcrypt"], deprecated="auto")
+pass_context= CryptContext(schemes=["argon2"], deprecated="auto")
 
 def hash_password(password: str):
     return pass_context.hash(password)
