@@ -15,7 +15,7 @@ def get_db():
     finally:
         db.close()
 
-#Parametros a recibir en la ruta
+#This is a the url that comes after the one in main.py
 @router.post("/login")
 def login(email:str, password:str, db: Session = Depends(get_db)):
     user = db.query(Owner).filter(Owner.email == email).first()
