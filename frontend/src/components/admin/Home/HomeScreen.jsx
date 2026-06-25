@@ -12,17 +12,54 @@ const HomeScreen = () => {
   return (
     <div className="home-container">
       
-      {/* Cabecera: Hora y Fecha */}
-      <div className="home-header">
-        <h1 className="home-time">11:21 PM</h1>
-        <span className="home-date">Friday, 06 Jan 2023</span>
+      {/* Contenedor Principal (Lado Izquierdo) */}
+      <div className="main-content">
+        
+        {/* Cabecera: Hora y Fecha */}
+        <div className="home-header">
+          <h1 className="home-time">11:21 PM</h1>
+          <span className="home-date">Friday, 06 Jan 2023</span>
+        </div>
+
+        {/* Fila de Estadísticas Superiores */}
+        <div className="stats-row">
+          <div className="stat-item">
+            <div className="stat-icon-wrapper"><Users size={24} /></div>
+            <p className="stat-value">75</p><p className="stat-label">Usuarios</p>
+          </div>
+          <div className="stat-item">
+            <div className="stat-icon-wrapper"><Coins size={24} /></div>
+            <p className="stat-value">67%</p><p className="stat-label">Solventes</p>
+          </div>
+          <div className="stat-item">
+            <div className="stat-icon-wrapper"><Lock size={24} color="#ff3b30" /></div>
+            <p className="stat-value">24</p><p className="stat-label">Bloqueados</p>
+          </div>
+          <div className="stat-item">
+            <div className="stat-icon-wrapper"><History size={24} /></div>
+            <p className="stat-value">30%</p><p className="stat-label">Pendientes</p>
+          </div>
+        </div>
+
+        {/* Contenedor Central: Imagen del Portón */}
+        <div className="gate-container">
+          <img src="/admin/porton.png" alt="Render de Portón" className="gate-image" />
+        </div>
+
+        {/* Sección Inferior: Textos y Notificación */}
+        <div className="home-footer">
+          <div className="footer-info">
+            <h2>Narayola II</h2>
+            <p>GMS 4G Activo</p>
+          </div>
+        </div>
+
       </div>
 
       {/* Panel Derecho: Accesos manuales */}
       <div className="manual-access-panel">
         <div className="panel-header">
           <h3 className="panel-title">Accesos manuales</h3>
-          {/* Al hacer click, abrimos el modal */}
           <button className="btn-add" onClick={() => setIsModalOpen(true)}>
             <Plus size={16} /> Agregar
           </button>
@@ -42,53 +79,17 @@ const HomeScreen = () => {
           ))}
         </div>
       </div>
-
-      {/* Fila de Estadísticas Superiores */}
-      <div className="stats-row">
-        {/* ... (Tu código de estadísticas se mantiene igual) ... */}
-        <div className="stat-item">
-          <div className="stat-icon-wrapper"><Users size={24} /></div>
-          <p className="stat-value">75</p><p className="stat-label">Usuarios</p>
-        </div>
-        <div className="stat-item">
-          <div className="stat-icon-wrapper"><Coins size={24} /></div>
-          <p className="stat-value">67%</p><p className="stat-label">Solventes</p>
-        </div>
-        <div className="stat-item">
-          <div className="stat-icon-wrapper"><Lock size={24} color="#ff3b30" /></div>
-          <p className="stat-value">24</p><p className="stat-label">Bloqueados</p>
-        </div>
-        <div className="stat-item">
-          <div className="stat-icon-wrapper"><History size={24} /></div>
-          <p className="stat-value">30%</p><p className="stat-label">Pendientes</p>
-        </div>
-      </div>
-
-      {/* Contenedor Central: Imagen del Portón */}
-      <div className="gate-container">
-        <img src="/admin/porton.png" alt="Render de Portón" className="gate-image" />
-      </div>
-
-      {/* Sección Inferior: Textos y Notificación */}
-      <div className="home-footer">
-        <div className="footer-info">
-          <h2>Narayola II</h2>
-          <p>GMS 4G Activo</p>
-        </div>
-      </div>
       
       {/* =========================================
-          NUEVO CÓDIGO: Modal de Registro Manual
+          Modal de Registro Manual
       ========================================= */}
       {isModalOpen && (
         <div className="modal-overlay">
           <div className="modal-container">
-            {/* Botón de cerrar superior derecho */}
             <button className="modal-close-btn" onClick={() => setIsModalOpen(false)}>
               <X size={20} />
             </button>
             
-            {/* Ícono central superior */}
             <div className="modal-icon-wrapper">
               <FileText size={28} color="#3b82f6" />
             </div>
@@ -96,7 +97,6 @@ const HomeScreen = () => {
             <h2 className="modal-title">Registrar Acceso</h2>
             <p className="modal-subtitle">Ingresa los datos del acceso manual</p>
             
-            {/* Formulario */}
             <div className="modal-form">
               <div className="form-group">
                 <label>Fecha y Hora</label>
@@ -112,7 +112,6 @@ const HomeScreen = () => {
               </div>
             </div>
             
-            {/* Botones de acción replicando el formato */}
             <button className="btn-modal-primary" onClick={() => setIsModalOpen(false)}>
               Registrar Acceso
             </button>

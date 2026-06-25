@@ -246,11 +246,25 @@ body {
   justify-content: flex-start;
 }
 
-.fire-icon {
+/* ... el resto de tu CSS anterior se mantiene igual ... */
+
+.payment-icon {
   width: 18px;
   height: 18px;
   color: #888;
 }
+
+/* Agregamos una clase extra para resaltar el icono de 'aprobado' */
+.check-icon {
+  color: #00e676;
+}
+
+.sos-btn {
+  justify-content: space-between;
+  padding: 16px 20px;
+}
+
+/* ... el resto de tu CSS posterior se mantiene igual ... */
 
 .sos-btn {
   justify-content: space-between;

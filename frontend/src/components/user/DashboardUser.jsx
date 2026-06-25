@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Zap, MapPin, MoreHorizontal, Wallet, CircleCheck } from 'lucide-react';
 import './DashboardUser.css';
 
 const DashboardUser = () => {
@@ -36,9 +37,7 @@ const DashboardUser = () => {
           <img src="/logo.png" alt="SICAP" className="logo-img" />
         </div>
         <div className="user-status-badge">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lightning-icon">
-            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-          </svg>
+          <Zap className="lightning-icon" />
           active
         </div>
       </header>
@@ -50,10 +49,7 @@ const DashboardUser = () => {
           <div className="gate-base"></div>
           
           <div className="location-badge">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="pin-icon">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-              <circle cx="12" cy="10" r="3"></circle>
-            </svg>
+            <MapPin className="pin-icon" />
             Narayola II
           </div>
         </div>
@@ -68,15 +64,11 @@ const DashboardUser = () => {
       <section className="dash-control-panel">
         <div className="panel-header">
           <h2>Bienvenido, Giuseppe</h2>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="dots-icon">
-            <circle cx="12" cy="12" r="1"></circle>
-            <circle cx="19" cy="12" r="1"></circle>
-            <circle cx="5" cy="12" r="1"></circle>
-          </svg>
+          <MoreHorizontal className="dots-icon" />
         </div>
 
         <div className="cards-grid">
-          {/* Tarjeta 1: Cuentas Pendientes (AHORA CON ONCLICK) */}
+          {/* Tarjeta 1: Cuentas Pendientes */}
           <div className="card pending-card clickable" onClick={handleOpenPending}>
             <p className="subtitle">Proximo corte<br/>en 30 dias</p>
             <div className="pending-content">
@@ -88,6 +80,7 @@ const DashboardUser = () => {
           {/* Tarjeta 2: Mensaje */}
           <div className="card message-card">
             <div className="icon-wrapper">
+              {/* Según la imagen, este se deja tal cual */}
               <img src="/user/msj.png" alt="Mensaje" className="msj-icon" />
             </div>
             <h3>Se verifico<br/>su pago<br/>de enero</h3>
@@ -96,9 +89,8 @@ const DashboardUser = () => {
 
         <div className="actions-row">
           <button className="action-btn payments-btn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="fire-icon">
-              <path d="M15.05 5A5 5 0 0 1 19 8.95M9 3v.01M12 21a9 9 0 0 0 8.94-8.06A4.5 4.5 0 0 0 16 8.5c-.32 0-.64.06-.94.17A6.47 6.47 0 0 0 10.5 4a6.5 6.5 0 0 0-4.47 11.23A4.5 4.5 0 0 0 12 21Z"></path>
-            </svg>
+            {/* Cambiado a un icono relacionado con pagos */}
+            <Wallet className="payment-icon" />
             Ver mis Pagos
           </button>
 
@@ -113,10 +105,8 @@ const DashboardUser = () => {
           <div className="notif-item">
             <div className="notif-icon-col">
               <div className="notif-icon-wrapper">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="small-icon">
-                  <circle cx="12" cy="12" r="3"></circle>
-                  <circle cx="12" cy="12" r="8"></circle>
-                </svg>
+                {/* Cambiado a un check de aprobado */}
+                <CircleCheck className="small-icon check-icon" />
               </div>
             </div>
             <div className="notif-content">
@@ -130,8 +120,6 @@ const DashboardUser = () => {
           {/* ... resto de las notificaciones ... */}
         </div>
       </section>
-
-     
 
       {/* --- MODALES --- */}
 

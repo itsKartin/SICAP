@@ -77,6 +77,7 @@ const AdminNav = () => {
                 <button className="export-option">Todos los usuarios</button>
                 <button className="export-option">Usuarios bloqueados</button>
                 <button className="export-option">Todos los pagos</button>
+                <button className="export-option">Accesos manuales</button>
               </div>
             )}
 
