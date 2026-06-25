@@ -1,4 +1,7 @@
 /* Contenedor principal de toda la vista */
+
+
+
 .admin-layout {
   display: flex;
   flex-direction: column;
@@ -117,4 +120,69 @@
 
 .admin-logo:hover {
   opacity: 1;
+}
+
+/* --- Nuevos estilos para el Menú de Exportar --- */
+
+/* Contenedor relativo para posicionar el menú */
+.export-container {
+  position: relative;
+  display: inline-block;
+}
+
+/* Animación opcional para el ícono cuando el menú está abierto */
+.export-icon-wrapper {
+  transition: transform 0.2s ease;
+}
+.export-icon-wrapper.open {
+  transform: rotate(45deg);
+}
+
+/* El menú desplegable flotante */
+.export-dropdown {
+  position: absolute;
+  bottom: calc(100% + 10px); /* Lo posiciona justo encima del botón */
+  left: 0;
+  background-color: #1a1a1a;
+  border: 1px solid #333333;
+  border-radius: 0.75rem;
+  padding: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 180px; /* Ancho mínimo para que el texto no se rompa */
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
+  z-index: 50;
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Opciones individuales dentro del menú */
+.export-option {
+  background: transparent;
+  border: none;
+  color: #a3a3a3;
+  text-align: left;
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  font-family: inherit;
+}
+
+.export-option:hover {
+  background-color: #2a2a2a;
+  color: #ffffff;
+}
+
+/* Animación de entrada suave */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

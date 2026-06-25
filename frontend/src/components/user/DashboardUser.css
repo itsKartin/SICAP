@@ -31,7 +31,7 @@ body {
   object-fit: contain;
 }
 
-.status-badge {
+.user-status-badge {
   position: absolute;
   right: 24px;
   display: flex;
@@ -480,5 +480,209 @@ body {
     left: 0;
     margin: 40px auto 20px auto;
     max-width: 400px;
+  }
+
+
+
+
+
+
+
+
+
+
+  
+}
+
+/* --- ESTILOS PARA LOS MODALES Y MENÚS DE PAGO --- */
+
+/* Hace que la tarjeta indique que se puede clickear */
+.card.clickable {
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.card.clickable:hover {
+  transform: translateY(-2px);
+  background-color: #2a2a2e;
+}
+
+/* Fondo oscuro desenfocado del modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 100; /* Por encima de todo, incluyendo el menú inferior */
+  display: flex;
+  justify-content: center;
+  align-items: flex-end; /* Lo pone estilo "BottomSheet" en móviles */
+}
+
+/* Caja de contenido del modal */
+.modal-content {
+  background-color: #1a1a1d;
+  width: 100%;
+  max-width: 428px;
+  border-radius: 24px 24px 0 0;
+  padding: 24px;
+  border-top: 1px solid #333;
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+  animation: slideUp 0.3s ease forwards;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.close-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #fff;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+/* Lista de deudas */
+.pending-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.pending-list-item {
+  background-color: #252529;
+  padding: 16px;
+  border-radius: 12px;
+  border-left: 4px solid #ff4d4d;
+}
+
+.pending-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pending-month {
+  font-weight: 500;
+  color: #fff;
+}
+
+.pending-amount {
+  color: #ff4d4d;
+  font-weight: 600;
+}
+
+/* Detalles del Banco */
+.bank-details {
+  background-color: #252529;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  border: 1px solid #333;
+}
+
+.bank-details p {
+  margin: 4px 0;
+  font-size: 0.9rem;
+  color: #aaa;
+}
+
+.bank-details strong {
+  color: #fff;
+}
+
+/* Formulario */
+.payment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.payment-form label {
+  font-size: 0.9rem;
+  color: #bbb;
+}
+
+.form-input {
+  background-color: #0d0d0f;
+  border: 1px solid #333;
+  color: #fff;
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 1rem;
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: #00e676;
+}
+
+/* Botones del modal */
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.modal-primary-btn {
+  background-color: #00e676;
+  color: #000;
+  border: none;
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  font-family: inherit;
+}
+
+.modal-secondary-btn {
+  background-color: transparent;
+  color: #fff;
+  border: 1px solid #444;
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  font-family: inherit;
+}
+
+/* Media query para hacer que el modal se centre en PC en lugar de pegarse abajo */
+@media (min-width: 850px) {
+  .modal-overlay {
+    align-items: center;
+  }
+  .modal-content {
+    border-radius: 24px;
+    border: 1px solid #333;
   }
 }
