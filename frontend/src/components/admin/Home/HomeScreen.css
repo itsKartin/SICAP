@@ -1,0 +1,407 @@
+/* Importamos la fuente Inter desde Google Fonts para asegurar que se renderice correctamente */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+/* Contenedor principal estructurado en Flexbox de fila */
+.home-container {
+  display: flex;
+  flex-direction: row; /* Coloca el contenido principal y el panel lado a lado */
+  gap: 3rem; /* Separación entre la izquierda y el panel */
+
+
+  padding: 2.5rem 5rem;
+  box-sizing: border-box;
+  position: relative;
+  
+  background-color: #0d0d0d;
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Columna izquierda que ocupa el espacio disponible */
+.main-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1; /* Ocupa el espacio sobrante */
+  min-width: 0; /* Evita desbordes horizontales */
+}
+
+/* Cabecera: Hora y Fecha */
+.home-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 2.5rem;
+}
+
+.home-time {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+}
+
+.home-date {
+  font-size: 0.8rem;
+  color: #a1a1aa;
+  margin: 0;
+}
+
+/* Fila de Estadísticas */
+.stats-row {
+  display: flex;
+  gap: 3.5rem;
+  margin-bottom: 1rem;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stat-icon-wrapper {
+  width: 45px; 
+  height: 45px;
+  background-color: #151515;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #d4d4d8;
+  margin-bottom: 0.25rem;
+}
+
+.stat-value {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: #888888;
+  margin: 0;
+}
+
+/* Contenedor de la Imagen Principal (Portón) */
+.gate-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  position: relative;
+  z-index: 0;
+}
+
+.gate-image { 
+  max-width: 70%; /*here bro*/
+  object-fit: contain;
+  opacity: 0.9;
+  filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.5));
+}
+
+/* Sección Inferior: Información */
+.home-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: auto;
+  z-index: 10;
+}
+
+.footer-info h2 {
+  font-size: 1.5rem;
+  color: #ffffff;
+  margin: 0 0 0.25rem 0;
+  font-weight: 500;
+}
+
+.footer-info p {
+  color: #00ff88;
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* =========================================
+   Panel de Accesos Manuales (Lado Derecho)
+========================================= */
+
+.manual-access-panel {
+  width: 310px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  z-index: 20;
+  flex-shrink: 0; /* Evita que el panel se encoja en pantallas pequeñas */
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.2rem;
+}
+
+.panel-title {
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.btn-add {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background-color: #f4f4f5;
+  color: #000000;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-add:hover {
+  background-color: #e4e4e7;
+}
+
+.access-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow-y: auto; /* Permite hacer scroll si hay muchos autos */
+  max-height: calc(100vh - 10rem); 
+  padding-right: 0.5rem;
+}
+
+/* Diseño elegante de la barra de scroll para el panel */
+.access-list::-webkit-scrollbar {
+  width: 4px;
+}
+.access-list::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+.access-card {
+  background-color: #121212;
+  border-radius: 6px;
+  padding: 0.1rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border: 1px solid #1f1f1f;
+}
+
+.access-card:hover {
+  background-color: #1a1a1a;
+}
+
+.car-image-wrapper {
+  width: 80px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.car-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.access-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.access-info h4 {
+  color: #ffffff;
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.access-info p {
+  color: #71717a;
+  margin: 0;
+  font-size: 0.75rem;
+}
+
+.access-chevron {
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+/* =========================================
+   Modal de Accesos Manuales
+========================================= */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-container {
+  background-color: #1c1c21; 
+  width: 380px;
+  border-radius: 16px;
+  padding: 2.5rem 2rem 2rem 2rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8);
+  border: 1px solid #2a2a32;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.2rem;
+  background: none;
+  border: none;
+  color: #71717a;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+  padding: 0;
+}
+
+.modal-close-btn:hover {
+  color: #ffffff;
+}
+
+.modal-icon-wrapper {
+  width: 64px;
+  height: 64px;
+  background-color: rgba(59, 130, 246, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.2rem;
+}
+
+.modal-title {
+  font-size: 1.3rem;
+  color: #ffffff;
+  margin: 0 0 0.4rem 0;
+  font-weight: 600;
+}
+
+.modal-subtitle {
+  font-size: 0.85rem;
+  color: #a1a1aa;
+  margin: 0 0 1.5rem 0;
+}
+
+.modal-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-bottom: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #2a2a32;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-size: 0.8rem;
+  color: #a1a1aa;
+  font-weight: 500;
+}
+
+.form-input {
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid #3f3f46;
+  padding: 0.5rem 0;
+  color: #ffffff;
+  font-size: 0.95rem;
+  outline: none;
+  font-family: 'Inter', sans-serif;
+  transition: border-color 0.2s;
+}
+
+.form-input::placeholder {
+  color: #52525b;
+}
+
+.form-input:focus {
+  border-bottom-color: #3b82f6;
+}
+
+.form-input::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+.btn-modal-primary {
+  width: 100%;
+  background-color: #2f65f6;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.9rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 1.2rem;
+  box-shadow: 0 4px 14px rgba(47, 101, 246, 0.4);
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-modal-primary:hover {
+  background-color: #2554d6;
+}
+
+.btn-modal-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-modal-secondary {
+  background: none;
+  border: none;
+  color: #ef4444; 
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.btn-modal-secondary:hover {
+  color: #f87171;
+}

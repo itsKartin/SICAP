@@ -3,11 +3,10 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 
 // Importamos los componentes del Administrador
 import AdminNav from './components/admin/AdminNav';
-import HomeScreen from './components/admin/HomeScreen';
-import AdminTowers from './components/admin/AdminTowers';
-import AdminPropietarios from './components/admin/AdminPropietarios';
-import AdminPagos from './components/admin/AdminPagos';
-import Bloqueados from './components/admin/Bloqueados';
+import HomeScreen from './components/admin/Home/HomeScreen';
+import AdminPropietarios from './components/admin/Propietarios/AdminPropietarios';
+import AdminPagos from './components/admin/Pagos/AdminPagos';
+import AdminBloqueados from './components/admin/Bloqueados/AdminBloqueados'; 
 
 // Importamos el componente de Usuario
 import DashboardUser from './components/user/DashboardUser';
@@ -31,10 +30,9 @@ function App() {
             <Route path="/admin" element={<AdminNav />}>
               <Route index element={<Navigate to="home" replace />} />
               <Route path="home" element={<HomeScreen />} />
-              <Route path="torres" element={<AdminTowers />} />
-              <Route path="torres/:towerId" element={<AdminPropietarios />} />
+              <Route path="owners" element={<AdminPropietarios />} />
               <Route path="pagos" element={<AdminPagos />} />
-              <Route path="bloqueados" element={<Bloqueados />} />
+              <Route path="bloqueados" element={<AdminBloqueados />} />
             </Route>
           </Routes>
         </div>

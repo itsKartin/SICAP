@@ -1,33 +1,99 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Zap, MapPin, MoreHorizontal, Wallet, CircleCheck } from 'lucide-react';
 import './DashboardUser.css';
 
 const DashboardUser = () => {
+  // Estado para controlar si el usuario está activo o inactivo
+  const [isActive, setIsActive] = useState(true); // Cambia a true para ver el color verde
+
+  // Estados para controlar los modales
+  const [showPendingMenu, setShowPendingMenu] = useState(false);
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
+  const [showPaymentsHistory, setShowPaymentsHistory] = useState(false);
+  const [reference, setReference] = useState('');
+
+  // Estado con la lista de deudas pendientes
+  const [pendingDebts] = useState([
+    { id: 1, month: 'Febrero 2026', amount: 15.00 },
+    { id: 2, month: 'Marzo 2026', amount: 15.00 }
+  ]);
+
+  // Estado con el historial de pagos del usuario
+  const [paymentHistory] = useState([
+    { id: 101, date: '15 Ene 2026', ref: '45158932', status: 'Aprobado', amount: 15.00 },
+    { id: 102, date: '18 Dic 2025', ref: '98765432', status: 'Aprobado', amount: 15.00 },
+    { id: 103, date: '20 Nov 2025', ref: '12349876', status: 'Rechazado', amount: 15.00 },
+    { id: 104, date: '15 Oct 2025', ref: '56781234', status: 'Aprobado', amount: 15.00 }
+  ]);
+
+  const [selectedDebts, setSelectedDebts] = useState([1, 2]);
+
+  // Manejadores de eventos
+  const handleOpenPending = () => setShowPendingMenu(true);
+  
+  const handleOpenPaymentForm = () => {
+    if (selectedDebts.length > 0) {
+      setShowPendingMenu(false);
+      setShowPaymentForm(true);
+    }
+  };
+
+  const handleOpenPaymentsHistory = () => {
+    setShowPendingMenu(false);
+    setShowPaymentForm(false);
+    setShowPaymentsHistory(true);
+  };
+
+  const handleCloseModals = () => {
+    setShowPendingMenu(false);
+    setShowPaymentForm(false);
+    setShowPaymentsHistory(false);
+    setReference('');
+  };
+
+  const handleSubmitPayment = (e) => {
+    e.preventDefault();
+    console.log("Pago reportado con referencia:", reference);
+    console.log("Deudas pagadas (IDs):", selectedDebts);
+    alert("¡Pago reportado exitosamente!");
+    handleCloseModals();
+  };
+
+  const toggleDebtSelection = (id) => {
+    setSelectedDebts(prev => 
+      prev.includes(id) 
+        ? prev.filter(debtId => debtId !== id)
+        : [...prev, id]
+    );
+  };
+
+  const totalToPay = pendingDebts
+    .filter(debt => selectedDebts.includes(debt.id))
+    .reduce((sum, debt) => sum + debt.amount, 0);
+
   return (
     <div className="dashboard-container">
       {/* HEADER */}
       <header className="dash-header">
         <div className="logo-wrapper">
-          <img src="/user/logo.png" alt="SICAP" className="logo-img" />
+          <img src="/logo.png" alt="SICAP" className="logo-img" />
         </div>
-        <div className="status-badge">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lightning-icon">
-            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-          </svg>
-          active
+        {/* Lógica dinámica para el estado del usuario */}
+        <div className={`user-status-badge ${!isActive ? 'inactive' : ''}`}>
+          <Zap className="lightning-icon" />
+          {isActive ? 'active' : 'inactivo'}
         </div>
       </header>
 
-      {/* HERO SECTION (PORTÓN) */}
+      {/* HERO SECTION */}
       <section className="dash-hero">
         <div className="gate-display">
           <img src="/user/port.png" alt="Portón" className="gate-img" />
-          <div className="gate-base"></div>
+          {/* Lógica dinámica para la base del portón */}
+          <div className={`gate-base ${!isActive ? 'inactive' : ''}`}></div>
           
           <div className="location-badge">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="pin-icon">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-              <circle cx="12" cy="10" r="3"></circle>
-            </svg>
+            <MapPin className="pin-icon" />
             Narayola II
           </div>
         </div>
@@ -41,25 +107,19 @@ const DashboardUser = () => {
       {/* PANEL DE CONTROL */}
       <section className="dash-control-panel">
         <div className="panel-header">
-          <h2>Panel de control</h2>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="dots-icon">
-            <circle cx="12" cy="12" r="1"></circle>
-            <circle cx="19" cy="12" r="1"></circle>
-            <circle cx="5" cy="12" r="1"></circle>
-          </svg>
+          <h2>Bienvenido, Giuseppe</h2>
+          <MoreHorizontal className="dots-icon" />
         </div>
 
         <div className="cards-grid">
-          {/* Tarjeta 1: Cuentas Pendientes */}
-          <div className="card pending-card">
+          <div className="card pending-card clickable" onClick={handleOpenPending}>
             <p className="subtitle">Proximo corte<br/>en 30 dias</p>
             <div className="pending-content">
-              <span className="highlight-number">2</span>
+              <span className="highlight-number">{pendingDebts.length}</span>
               <h3>Cuentas<br/>Pendientes</h3>
             </div>
           </div>
 
-          {/* Tarjeta 2: Mensaje */}
           <div className="card message-card">
             <div className="icon-wrapper">
               <img src="/user/msj.png" alt="Mensaje" className="msj-icon" />
@@ -69,30 +129,23 @@ const DashboardUser = () => {
         </div>
 
         <div className="actions-row">
-          {/* Botón Ver Pagos */}
-          <button className="action-btn payments-btn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="fire-icon">
-              <path d="M15.05 5A5 5 0 0 1 19 8.95M9 3v.01M12 21a9 9 0 0 0 8.94-8.06A4.5 4.5 0 0 0 16 8.5c-.32 0-.64.06-.94.17A6.47 6.47 0 0 0 10.5 4a6.5 6.5 0 0 0-4.47 11.23A4.5 4.5 0 0 0 12 21Z"></path>
-            </svg>
+          <button className="action-btn payments-btn" onClick={handleOpenPaymentsHistory}>
+            <Wallet className="payment-icon" />
             Ver mis Pagos
           </button>
 
-          {/* Botón SOS */}
           <div className="action-btn sos-btn">
             <span className="sos-text">SOS</span>
             <div className="toggle-switch"></div>
           </div>
         </div>
 
-        {/* NOTIFICACIONES TIPO IPHONE SEPARADAS */}
+        {/* NOTIFICACIONES */}
         <div className="notifications-container">
           <div className="notif-item">
             <div className="notif-icon-col">
               <div className="notif-icon-wrapper">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="small-icon">
-                  <circle cx="12" cy="12" r="3"></circle>
-                  <circle cx="12" cy="12" r="8"></circle>
-                </svg>
+                <CircleCheck className="small-icon check-icon" />
               </div>
             </div>
             <div className="notif-content">
@@ -103,82 +156,118 @@ const DashboardUser = () => {
               <p className="notif-desc">Pago #4515 Acreditado</p>
             </div>
           </div>
-
-          <div className="notif-item">
-            <div className="notif-icon-col">
-              <div className="notif-icon-wrapper">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="small-icon">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                  <circle cx="12" cy="10" r="3"></circle>
-                </svg>
-              </div>
-            </div>
-            <div className="notif-content">
-              <div className="notif-header">
-                <span className="notif-title">Sicap</span>
-                <div className="notif-time-col">
-                  <span className="notif-time">6:12 pm</span>
-
-                </div>
-              </div>
-              <p className="notif-desc">Agregado exitosamente</p>
-            </div>
-          </div>
-
-          <div className="notif-item">
-            <div className="notif-icon-col">
-              <div className="notif-icon-wrapper">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="small-icon">
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                </svg>
-              </div>
-            </div>
-            <div className="notif-content">
-              <div className="notif-header">
-                <span className="notif-title">Sistema</span>
-                <span className="notif-time">6:15 pm</span>
-              </div>
-              <p className="notif-desc">Mantenimiento programado</p>
-            </div>
-          </div>
         </div>
       </section>
 
-      {/* BOTTOM NAVIGATION */}
-      <nav className="dash-bottom-nav">
-        <div className="nav-container">
-          <div className="nav-item active">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="3" width="7" height="7"></rect>
-              <rect x="14" y="3" width="7" height="7"></rect>
-              <rect x="14" y="14" width="7" height="7"></rect>
-              <rect x="3" y="14" width="7" height="7"></rect>
-            </svg>
-            <span>Feed</span>
-            <div className="active-indicator"></div>
-          </div>
-          <div className="nav-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="5"></circle>
-              <line x1="12" y1="1" x2="12" y2="3"></line>
-              <line x1="12" y1="21" x2="12" y2="23"></line>
-              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-              <line x1="1" y1="12" x2="3" y2="12"></line>
-              <line x1="21" y1="12" x2="23" y2="12"></line>
-              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-            </svg>
-          </div>
-          <div className="nav-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
+      {/* --- MODALES --- */}
+
+      {/* Modal 1: Lista de Cuentas Pendientes */}
+      {showPendingMenu && (
+        <div className="modal-overlay" onClick={handleCloseModals}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Cuentas Pendientes</h3>
+              <button className="close-btn" onClick={handleCloseModals}>✕</button>
+            </div>
+            
+            <div className="pending-list">
+              {pendingDebts.map(debt => {
+                const isSelected = selectedDebts.includes(debt.id);
+                return (
+                  <div 
+                    key={debt.id} 
+                    className={`pending-list-item ${isSelected ? 'selected' : ''}`}
+                    onClick={() => toggleDebtSelection(debt.id)}
+                  >
+                    <div className="pending-info">
+                      <span className="pending-month">{debt.month}</span>
+                      <span className="pending-amount">${debt.amount.toFixed(2)}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <button 
+              className="modal-primary-btn" 
+              onClick={handleOpenPaymentForm}
+              disabled={selectedDebts.length === 0}
+              style={{ 
+                opacity: selectedDebts.length === 0 ? 0.5 : 1, 
+                cursor: selectedDebts.length === 0 ? 'not-allowed' : 'pointer' 
+              }}
+            >
+              Pagar Deuda (${totalToPay.toFixed(2)})
+            </button>
           </div>
         </div>
-      </nav>
+      )}
+
+      {/* Modal 2: Formulario de Pago */}
+      {showPaymentForm && (
+        <div className="modal-overlay" onClick={handleCloseModals}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Reportar Pago</h3>
+              <button className="close-btn" onClick={handleCloseModals}>✕</button>
+            </div>
+
+            <div className="bank-details">
+              <p><strong>Banco:</strong> Banesco</p>
+              <p><strong>Cta:</strong> 0134-XXXX-XXXX-XXXX-XXXX</p>
+              <p><strong>RIF:</strong> J-12345678-9</p>
+              <p><strong>Monto total:</strong> ${totalToPay.toFixed(2)} (Cambio BCV)</p>
+            </div>
+
+            <form onSubmit={handleSubmitPayment} className="payment-form">
+              <label htmlFor="refInput">Número de Referencia:</label>
+              <input 
+                type="text" 
+                id="refInput"
+                className="form-input" 
+                placeholder="Ej. 12345678" 
+                value={reference}
+                onChange={(e) => setReference(e.target.value)}
+                required
+              />
+              <div className="form-actions">
+                <button type="button" className="modal-secondary-btn" onClick={handleCloseModals}>Cancelar</button>
+                <button type="submit" className="modal-primary-btn">Enviar Pago</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal 3: Historial de Pagos */}
+      {showPaymentsHistory && (
+        <div className="modal-overlay" onClick={handleCloseModals}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Historial de Pagos</h3>
+              <button className="close-btn" onClick={handleCloseModals}>✕</button>
+            </div>
+
+            <div className="history-list">
+              {paymentHistory.map(payment => (
+                <div key={payment.id} className="history-item">
+                  <div className="history-row">
+                    <span className="history-date">{payment.date}</span>
+                    <span className="history-amount">${payment.amount.toFixed(2)}</span>
+                  </div>
+                  <div className="history-row">
+                    <span className="history-ref">Ref: {payment.ref}</span>
+                    <span className={`history-status status-${payment.status.toLowerCase()}`}>
+                      {payment.status}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
