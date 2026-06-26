@@ -10,7 +10,7 @@ import {
   MoreVertical,
   ShieldAlert
 } from 'lucide-react';
-import './AdminBloqueados.css';
+import './css/AdminBloqueados.css';
 
 // Modal original para detalles de bloqueo
 const BlockDetailsModal = ({ user, isOpen, onClose, onUnblock, onKeepBlocked }) => {

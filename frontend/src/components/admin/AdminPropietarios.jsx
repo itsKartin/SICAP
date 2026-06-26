@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './AdminPropietarios.css';
+import './css/AdminPropietarios.css';
 import { 
   FiPlus, FiSearch, FiUser, FiAtSign, FiPhone, FiHash, FiHome, FiFileText, FiActivity, FiX
 } from 'react-icons/fi';

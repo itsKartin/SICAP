@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Users, Coins, Lock, History, X, Plus, ChevronRight, FileText } from 'lucide-react';
-import './HomeScreen.css';
+import './css/HomeScreen.css';
 
 const HomeScreen = () => {
   // Arreglo temporal para renderizar los 4 items de accesos manuales

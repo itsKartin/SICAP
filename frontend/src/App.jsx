@@ -3,10 +3,10 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 
 // Importamos los componentes del Administrador
 import AdminNav from './components/admin/AdminNav';
-import HomeScreen from './components/admin/Home/HomeScreen';
-import AdminPropietarios from './components/admin/Propietarios/AdminPropietarios';
-import AdminPagos from './components/admin/Pagos/AdminPagos';
-import AdminBloqueados from './components/admin/Bloqueados/AdminBloqueados'; 
+import HomeScreen from './components/admin/HomeScreen';
+import AdminPropietarios from './components/admin/AdminPropietarios';
+import AdminPagos from './components/admin/AdminPagos';
+import AdminBloqueados from './components/admin/AdminBloqueados'; 
 
 // Importamos el componente de Usuario
 import DashboardUser from './components/user/DashboardUser';

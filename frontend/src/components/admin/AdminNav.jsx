@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 // Importamos los nuevos íconos más acordes al contexto
 import { LayoutGrid, Users, CreditCard, Ban, ArrowUpRight } from 'lucide-react';
 import { NavLink, Outlet } from 'react-router-dom'; 
-import './AdminNav.css';
+import './css/AdminNav.css';
 
 const AdminNav = () => {
   // Estado para controlar el menú de exportación
