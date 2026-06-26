@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from ..database import SessionLocal
 from ..models import Admin, Owner, Payment, MonthlyDue, Incident
 from ..auth import hash_password
+from ..schemas import OwnerCreate
 
 
 router = APIRouter()
@@ -16,13 +17,26 @@ def get_db():
         db.close()
 
 #This is a the url that comes after the one in main.py
+
 @router.post("/newowner")
-def createowner(firstname:str, lastname:str, email:str, phone:int, ci:int, apartment:str, floor:str, tower:str, passw:str, db: Session=Depends(get_db)):
-    newowner= Owner(first_name= firstname, last_name= lastname, email = email, phone = phone, ci = ci, apartment = apartment, floor = floor, tower = tower, password = hash_password(passw), monthly_fee = 5)
+def createowner(owner: OwnerCreate, db: Session = Depends(get_db)):
+    newowner = Owner(
+        first_name=owner.firstname,
+        last_name=owner.lastname,
+        email=owner.email,
+        phone=owner.phone,
+        ci=owner.ci,
+        apartment=owner.apartment,
+        floor=owner.floor,
+        tower=owner.tower,
+        password=hash_password(owner.passw),
+        monthly_fee=5
+    )
     db.add(newowner)
     db.commit()
     db.refresh(newowner)
-    return {"message":"owner created", "id": newowner.id}
+    return {"message": "owner created", "id": newowner.id}
+
 
 @router.get("/ownerlist")
 def ownerlist(db: Session= Depends(get_db)):
@@ -31,4 +45,4 @@ def ownerlist(db: Session= Depends(get_db)):
 
 @router.post("/payment-verification")
 def paymentverify(db: Session= Depends(get_db)):
-    verify= Payment(status='paid')
+    pass
