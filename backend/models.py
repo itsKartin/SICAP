@@ -37,7 +37,8 @@ class Payment(Base):
     amount_bs = Column(Float, nullable=False)
     payment_date = Column(Date, nullable=False)
     receipt = Column(String(100), nullable=False)
-    status = Column(Enum("paid", "pending", "late"), nullable=False)
+    exchange_rate = Column(Float, nullable=False)
+    status = Column(Enum("paid", "pending"), nullable=False)
 
 class Admin(Base):
     __tablename__ = 'administrators'
