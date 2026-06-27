@@ -7,6 +7,7 @@ import HomeScreen from './components/admin/HomeScreen';
 import AdminPropietarios from './components/admin/AdminPropietarios';
 import AdminPagos from './components/admin/AdminPagos';
 import AdminBloqueados from './components/admin/AdminBloqueados'; 
+import ManualAccess from './components/admin/ManualAccess';
 
 // Importamos el componente de Usuario
 import DashboardUser from './components/user/DashboardUser';
@@ -33,6 +34,7 @@ function App() {
               <Route path="owners" element={<AdminPropietarios />} />
               <Route path="pagos" element={<AdminPagos />} />
               <Route path="bloqueados" element={<AdminBloqueados />} />
+              <Route path="manual-access" element={<ManualAccess/>} />
             </Route>
           </Routes>
         </div>

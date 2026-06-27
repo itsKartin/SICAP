@@ -56,71 +56,8 @@ const HomeScreen = () => {
 
       </div>
 
-      {/* Panel Derecho: Accesos manuales */}
-      <div className="manual-access-panel">
-        <div className="panel-header">
-          <h3 className="panel-title">Accesos manuales</h3>
-          <button className="btn-add" onClick={() => setIsModalOpen(true)}>
-            <Plus size={16} /> Agregar
-          </button>
-        </div>
-        <div className="access-list">
-          {manualAccesses.map((item) => (
-            <div key={item} className="access-card">
-              <div className="car-image-wrapper">
-                <img src="/admin/car-2.png" alt="Auto" />
-              </div>
-              <div className="access-info">
-                <h4>Giuseppe Papa</h4>
-                <p>Acceso manual 6:10 pm</p>
-              </div>
-              <ChevronRight size={18} color="#555555" className="access-chevron" />
-            </div>
-          ))}
-        </div>
-      </div>
+
       
-      {/* =========================================
-          Modal de Registro Manual
-      ========================================= */}
-      {isModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal-container">
-            <button className="modal-close-btn" onClick={() => setIsModalOpen(false)}>
-              <X size={20} />
-            </button>
-            
-            <div className="modal-icon-wrapper">
-              <FileText size={28} color="#3b82f6" />
-            </div>
-            
-            <h2 className="modal-title">Registrar Acceso</h2>
-            <p className="modal-subtitle">Ingresa los datos del acceso manual</p>
-            
-            <div className="modal-form">
-              <div className="form-group">
-                <label>Fecha y Hora</label>
-                <input type="datetime-local" className="form-input" />
-              </div>
-              <div className="form-group">
-                <label>Usuario</label>
-                <input type="text" placeholder="Ej. Carlos Lugo - Apto 511" className="form-input" />
-              </div>
-              <div className="form-group">
-                <label>Descripción</label>
-                <input type="text" placeholder="Ej. Visita técnica" className="form-input" />
-              </div>
-            </div>
-            
-            <button className="btn-modal-primary" onClick={() => setIsModalOpen(false)}>
-              Registrar Acceso
-            </button>
-            <button className="btn-modal-secondary" onClick={() => setIsModalOpen(false)}>
-              Cancelar
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

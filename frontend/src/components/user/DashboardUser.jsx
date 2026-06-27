@@ -4,7 +4,7 @@ import './DashboardUser.css';
 
 const DashboardUser = () => {
   // Estado para controlar si el usuario está activo o inactivo
-  const [isActive, setIsActive] = useState(true); // Cambia a true para ver el color verde
+  const [isActive, setIsActive] = useState(false); // Cambia a true para ver el color verde
 
   // Estados para controlar los modales
   const [showPendingMenu, setShowPendingMenu] = useState(false);
@@ -80,7 +80,7 @@ const DashboardUser = () => {
         </div>
         {/* Lógica dinámica para el estado del usuario */}
         <div className={`user-status-badge ${!isActive ? 'inactive' : ''}`}>
-          <Zap className="lightning-icon" />
+       
           {isActive ? 'active' : 'inactivo'}
         </div>
       </header>
