@@ -4,7 +4,7 @@ import './DashboardUser.css';
 
 const DashboardUser = () => {
   // Estado para controlar si el usuario está activo o inactivo
-  const [isActive, setIsActive] = useState(false); // Cambia a true para ver el color verde
+  const [isActive, setIsActive] = useState(false);
 
   // Estados para controlar los modales
   const [showPendingMenu, setShowPendingMenu] = useState(false);
@@ -26,16 +26,12 @@ const DashboardUser = () => {
     { id: 104, date: '15 Oct 2025', ref: '56781234', status: 'Aprobado', amount: 15.00 }
   ]);
 
-  const [selectedDebts, setSelectedDebts] = useState([1, 2]);
-
   // Manejadores de eventos
   const handleOpenPending = () => setShowPendingMenu(true);
   
   const handleOpenPaymentForm = () => {
-    if (selectedDebts.length > 0) {
-      setShowPendingMenu(false);
-      setShowPaymentForm(true);
-    }
+    setShowPendingMenu(false);
+    setShowPaymentForm(true);
   };
 
   const handleOpenPaymentsHistory = () => {
@@ -54,22 +50,13 @@ const DashboardUser = () => {
   const handleSubmitPayment = (e) => {
     e.preventDefault();
     console.log("Pago reportado con referencia:", reference);
-    console.log("Deudas pagadas (IDs):", selectedDebts);
+    console.log("Deudas pagadas (IDs):", pendingDebts.map(d => d.id));
     alert("¡Pago reportado exitosamente!");
     handleCloseModals();
   };
 
-  const toggleDebtSelection = (id) => {
-    setSelectedDebts(prev => 
-      prev.includes(id) 
-        ? prev.filter(debtId => debtId !== id)
-        : [...prev, id]
-    );
-  };
-
-  const totalToPay = pendingDebts
-    .filter(debt => selectedDebts.includes(debt.id))
-    .reduce((sum, debt) => sum + debt.amount, 0);
+  // Suma total de todas las deudas pendientes
+  const totalToPay = pendingDebts.reduce((sum, debt) => sum + debt.amount, 0);
 
   return (
     <div className="dashboard-container">
@@ -78,9 +65,7 @@ const DashboardUser = () => {
         <div className="logo-wrapper">
           <img src="/logo.png" alt="SICAP" className="logo-img" />
         </div>
-        {/* Lógica dinámica para el estado del usuario */}
         <div className={`user-status-badge ${!isActive ? 'inactive' : ''}`}>
-       
           {isActive ? 'active' : 'inactivo'}
         </div>
       </header>
@@ -89,18 +74,11 @@ const DashboardUser = () => {
       <section className="dash-hero">
         <div className="gate-display">
           <img src="/user/port.png" alt="Portón" className="gate-img" />
-          {/* Lógica dinámica para la base del portón */}
           <div className={`gate-base ${!isActive ? 'inactive' : ''}`}></div>
-          
           <div className="location-badge">
             <MapPin className="pin-icon" />
             Narayola II
           </div>
-        </div>
-        
-        <div className="pagination-dots">
-          <span className="dot active"></span>
-          <span className="dot"></span>
         </div>
       </section>
 
@@ -161,7 +139,7 @@ const DashboardUser = () => {
 
       {/* --- MODALES --- */}
 
-      {/* Modal 1: Lista de Cuentas Pendientes */}
+      {/* Modal 1: Lista de Cuentas Pendientes (Simplificado) */}
       {showPendingMenu && (
         <div className="modal-overlay" onClick={handleCloseModals}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -171,31 +149,22 @@ const DashboardUser = () => {
             </div>
             
             <div className="pending-list">
-              {pendingDebts.map(debt => {
-                const isSelected = selectedDebts.includes(debt.id);
-                return (
-                  <div 
-                    key={debt.id} 
-                    className={`pending-list-item ${isSelected ? 'selected' : ''}`}
-                    onClick={() => toggleDebtSelection(debt.id)}
-                  >
-                    <div className="pending-info">
-                      <span className="pending-month">{debt.month}</span>
-                      <span className="pending-amount">${debt.amount.toFixed(2)}</span>
-                    </div>
+              {pendingDebts.map(debt => (
+                <div 
+                  key={debt.id} 
+                  className="pending-list-item selected" 
+                >
+                  <div className="pending-info">
+                    <span className="pending-month">{debt.month}</span>
+                    <span className="pending-amount">${debt.amount.toFixed(2)}</span>
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
 
             <button 
               className="modal-primary-btn" 
               onClick={handleOpenPaymentForm}
-              disabled={selectedDebts.length === 0}
-              style={{ 
-                opacity: selectedDebts.length === 0 ? 0.5 : 1, 
-                cursor: selectedDebts.length === 0 ? 'not-allowed' : 'pointer' 
-              }}
             >
               Pagar Deuda (${totalToPay.toFixed(2)})
             </button>
