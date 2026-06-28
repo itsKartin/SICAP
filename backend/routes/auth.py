@@ -26,7 +26,7 @@ def login(email:str, password:str, db: Session = Depends(get_db)):
 
     user = db.query(Owner).filter(Owner.email == email).first()
     if user and verify_password(password, user.password):
-        token = create_token("id": user.id, "email": user.email, "role": "owner")
+        token = create_token({"id": user.id, "email": user.email, "role": "owner"})
         return {"acces_token": token, "role": "owner"}
     
     raise HTTPException(status_code=401, detail="Invalid credentials")
