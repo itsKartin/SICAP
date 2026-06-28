@@ -33,7 +33,9 @@ const AdminPropietarios = () => {
 const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // 1. Mapeamos los datos del estado de React al esquema que espera FastAPI
+    // 1. Recuperamos el token almacenado al hacer login
+    const token = localStorage.getItem('access_token');
+    
     const payload = {
       firstname: formData.firstName,
       lastname: formData.lastName,
@@ -43,17 +45,16 @@ const handleSubmit = async (e) => {
       apartment: formData.apartament,
       floor: formData.piso,
       tower: formData.torre,
-      passw: formData.ci // Usamos la cédula como contraseña
+      passw: formData.ci
     };
 
     try {
-      // 2. Realizamos la petición HTTP POST al backend
-      // NOTA: Reemplaza la URL base por la tuya. Como indicaste que la ruta
-      // viene después del main.py, asegúrate de colocar el prefijo correcto (ej: /admin/newowner o /api/newowner)
-      const response = await fetch('http://localhost:8000/admin/newowner', {
+      const response = await fetch('http://192.168.1.109:8000/admin/newowner', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          // 2. AÑADIMOS EL TOKEN AQUÍ
+          'Authorization': `Bearer ${token}` 
         },
         body: JSON.stringify(payload)
       });
@@ -61,7 +62,6 @@ const handleSubmit = async (e) => {
       if (response.ok) {
         const data = await response.json();
         
-        // 3. Si es exitoso, actualizamos la tabla del frontend usando el ID que devuelve la base de datos
         const newUser = {
           ...formData,
           id: data.id, 
@@ -70,23 +70,15 @@ const handleSubmit = async (e) => {
         };
         
         setPropietarios([...propietarios, newUser]);
-        setIsModalOpen(false); // Cierra el modal
+        setIsModalOpen(false);
         
-        // Limpiamos el formulario
         setFormData({ 
-          firstName: '', 
-          lastName: '', 
-          email: '', 
-          telefono: '', 
-          ci: '', 
-          apartament: '', 
-          piso: '', 
-          torre: '' 
+          firstName: '', lastName: '', email: '', telefono: '', 
+          ci: '', apartament: '', piso: '', torre: '' 
         });
         
         alert("Propietario creado con éxito");
       } else {
-        // Manejo de errores que devuelva FastAPI (ej: un 400 Bad Request o email duplicado)
         const errorData = await response.json();
         alert(`Error al crear propietario: ${errorData.detail || 'Revisa los datos enviados'}`);
       }

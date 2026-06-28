@@ -18,27 +18,47 @@ const Auth = ({ onLoginSuccess }) => {
     e.preventDefault();
 
     try {
-      const response = await fetch(`http://192.168.1.109:3000/users?email=${formData.email}&password=${formData.password}`);
-      const users = await response.json();
+      // 1. Cambiamos la URL al puerto de tu backend FastAPI (usualmente 8000)
+      // Nota: Si tu router tiene un prefijo en main.py (ej. /auth o /api), añádelo a la URL.
 
-      if (users.length > 0) {
-        onLoginSuccess(users[0]);
+      const response = await fetch('http://192.168.1.109:8000/auth/token', {
+        method: 'POST', // 2. El backend espera un POST
+        headers: {
+          'Content-Type': 'application/json', // 3. Indicamos que enviamos JSON
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password
+        }) // 4. Enviamos el email y password en el cuerpo de la petición
+      });
+
+      if (response.ok) {
+        // Si el status es 200 (OK)
+        const data = await response.json();
+        
+        // Opcional: Puedes guardar el token en localStorage para mantener la sesión
+        localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('role', data.role);
+
+        // Pasamos los datos del usuario/token a la función padre
+        onLoginSuccess(data);
       } else {
-        setError('Correo o contraseña incorrectos');
+        // Si hay un error (ej. 401 Invalid credentials), FastAPI devuelve un 'detail'
+        const errorData = await response.json();
+        setError(errorData.detail || 'Correo o contraseña incorrectos');
       }
     } catch (err) {
+      console.error(err);
       setError('No se pudo conectar con el servidor.');
     }
   };
 
   return (
     <div className="auth-container">
-      {/* Capa oscura sobre la imagen de fondo */}
       <div className="auth-overlay"></div> 
 
       <div className="auth-card">
         <header className="auth-header">
-          {/* Aquí se reemplazó el texto SICAP por tu logo */}
           <img src="/logo.png" alt="Logo de la aplicación" className="auth-logo" />
           <p className="auth-subtitle">
             Ingrese sus datos para acceder

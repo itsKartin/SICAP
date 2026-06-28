@@ -74,7 +74,7 @@ const HomeScreen = () => {
 
         {/* Contenedor Central: Imagen del Portón */}
         <div className="gate-container">
-          <img src="/admin/porton.png" alt="Render de Portón" className="gate-image" />
+          <img src="/user/port.png" alt="Render de Portón" className="gate-image" />
         </div>
 
         {/* Sección Inferior: Textos y Notificación */}
