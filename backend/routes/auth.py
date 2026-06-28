@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 from ..database import SessionLocal
 from ..models import Admin, Owner
 from ..auth import verify_password, create_token
+from ..schemas import LoginRequest
+from fastapi.security import OAuth2PasswordRequestForm
 
 
 router = APIRouter()
@@ -17,16 +19,15 @@ def get_db():
 
 #This is a the url that comes after the one in main.py
 @router.post("/login")
-def login(email:str, password:str, db: Session = Depends(get_db)):
-
-    admin = db.query(Admin).filter(Admin.email == email).first()
-    if admin and verify_password(password, admin.password):
+def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    admin = db.query(Admin).filter(Admin.email == form.username).first()
+    if admin and verify_password(form.password, admin.password):
         token = create_token({"id": admin.id, "email": admin.email, "role": "admin"})
-        return {"acces_token": token, "role": "admin"}
+        return {"access_token": token, "token_type": "bearer", "role": "admin"}
 
-    user = db.query(Owner).filter(Owner.email == email).first()
-    if user and verify_password(password, user.password):
-        token = create_token({"id": user.id, "email": user.email, "role": "owner"})
-        return {"acces_token": token, "role": "owner"}
-    
+    owner = db.query(Owner).filter(Owner.email == form.username).first()
+    if owner and verify_password(form.password, owner.password):
+        token = create_token({"id": owner.id, "email": owner.email, "role": "owner"})
+        return {"access_token": token, "token_type": "bearer", "role": "owner"}
+
     raise HTTPException(status_code=401, detail="Invalid credentials")

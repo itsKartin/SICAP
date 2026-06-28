@@ -1,5 +1,10 @@
 from pydantic import BaseModel
 from typing import Optional
+from datetime import date
+
+class LoginRequest(BaseModel):
+    email:str
+    password:str
 
 class OwnerCreate(BaseModel):
     firstname: str
@@ -27,6 +32,16 @@ class OwnerOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+class PaymentOut(BaseModel):
+    id: int
+    owner_id: int
+    amount_bs: float
+    payment_date: date
+    receipt: Optional[str]
+    status: str
+    owner_name: str
+    owner_apartment: str
 
 class VerifyPaymentResponse(BaseModel):
     message: str

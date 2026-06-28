@@ -1,10 +1,14 @@
+import io
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import func
+from fpdf import FPDF
+from datetime import date
 from ..database import SessionLocal
 from ..models import Admin, Owner, Payment, MonthlyDue
 from ..auth import hash_password, get_current_admin
-from ..schemas import OwnerCreate, OwnerOut, VerifyPaymentResponse
+from ..schemas import OwnerCreate, OwnerOut, PaymentOut, VerifyPaymentResponse
 from ..services.exchange import usd_value
 from ..services.sms import block, add
 
@@ -42,6 +46,30 @@ def createowner(owner: OwnerCreate, db: Session = Depends(get_db), admin=Depends
 @router.get("/ownerlist", response_model=list[OwnerOut])
 def ownerlist(db: Session = Depends(get_db), admin=Depends(get_current_admin)):
     return db.query(Owner).all()
+
+@router.get("/pending-payments", response_model=list[PaymentOut])
+def pending_payments(db: Session = Depends(get_db), admin=Depends(get_current_admin)):
+    payments = (
+        db.query(Payment, Owner)
+        .join(Owner, Payment.owner_id == Owner.id)
+        .filter(Payment.status == "pending")
+        .order_by(Payment.payment_date.asc())
+        .all()
+    )
+
+    result = []
+    for payment, owner in payments:
+        result.append(PaymentOut(
+            id=payment.id,
+            owner_id=payment.owner_id,
+            amount_bs=payment.amount_bs,
+            payment_date=payment.payment_date,
+            receipt=payment.receipt,
+            status=payment.status,
+            owner_name=f"{owner.first_name} {owner.last_name}",
+            owner_apartment=owner.apartment
+        ))
+    return result
 
 @router.post("/payment-verification/{payment_id}", response_model=VerifyPaymentResponse)
 def paymentverify(payment_id: int, db: Session = Depends(get_db), admin=Depends(get_current_admin)):
@@ -123,4 +151,58 @@ def paymentverify(payment_id: int, db: Session = Depends(get_db), admin=Depends(
         pending_dues_count=pending_dues_count,
         pending_debt_usd=float(remaining_debt),
         overpayment_usd=overpayment
+    )
+
+
+@router.get("/owners-report/pdf")
+def owners_pdf(db: Session = Depends(get_db), admin=Depends(get_current_admin)):
+    owners = db.query(Owner).order_by(Owner.tower, Owner.floor, Owner.apartment).all()
+
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Helvetica", "B", 16)
+    pdf.cell(0, 10, "Reporte de Propietarios", new_x="LMARGIN", new_y="NEXT", align="C")
+    pdf.set_font("Helvetica", "", 10)
+    pdf.cell(0, 6, f"Generado el: {date.today().strftime('%d de %B de %Y')}", new_x="LMARGIN", new_y="NEXT", align="C")
+    pdf.ln(6)
+
+    headers = ["Nombre", "CI", "Apto", "Piso", "Torre", "Estatus"]
+    widths =  [55,       25,   20,     20,     20,      30]
+
+    pdf.set_font("Helvetica", "B", 9)
+    pdf.set_fill_color(30, 30, 30)
+    pdf.set_text_color(255, 255, 255)
+    for header, width in zip(headers, widths):
+        pdf.cell(width, 8, header, border=1, fill=True)
+    pdf.ln()
+
+    pdf.set_font("Helvetica", "", 9)
+    pdf.set_text_color(0, 0, 0)
+
+    for i, owner in enumerate(owners):
+        fill = i % 2 == 0
+        pdf.set_fill_color(245, 245, 245) if fill else pdf.set_fill_color(255, 255, 255)
+        status_label = "Activo" if owner.status == "active" else "Bloqueado"
+        row = [
+            f"{owner.first_name} {owner.last_name}",
+            owner.ci,
+            owner.apartment,
+            owner.floor,
+            owner.tower,
+            status_label
+        ]
+        for value, width in zip(row, widths):
+            pdf.cell(width, 7, str(value), border=1, fill=fill)
+        pdf.ln()
+
+    pdf.ln(8)
+    pdf.set_font("Helvetica", "I", 8)
+    pdf.set_text_color(120, 120, 120)
+    pdf.cell(0, 6, f"Total de propietarios: {len(owners)}", new_x="LMARGIN", new_y="NEXT")
+
+    buffer = io.BytesIO(bytes(pdf.output()))
+    return StreamingResponse(
+        buffer,
+        media_type="application/pdf",
+        headers={"Content-Disposition": "attachment; filename=reporte_propietarios.pdf"}
     )

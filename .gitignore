@@ -4,3 +4,5 @@ db.sqlite3
 .env
 *.pyc
 node_modules/
+
+create_admin.py
