@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './css/AdminPropietarios.css';
 import { 
   FiPlus, FiSearch, FiUser, FiAtSign, FiPhone, FiHash, FiHome, FiFileText, FiActivity, FiX
 } from 'react-icons/fi';
 
 const AdminPropietarios = () => {
+  // Estados para los filtros
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all'); // Nuevo estado para el select
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   
-  // Estado para el formulario (sin status ni cuotas, incluyendo piso y torre)
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -20,20 +22,58 @@ const AdminPropietarios = () => {
     torre: ''
   });
 
-  const [propietarios, setPropietarios] = useState([
-    { id: 1, firstName: 'Milos', lastName: 'Stojanovic', email: 'stojanovic.loshmi@gmail.com', telefono: '0414-1234567', ci: '12345678', apartament: '1A', status: 'Active', cuotasAcumuladas: 0 },
-    // ... tus otros datos simulados
-  ]);
+  const [propietarios, setPropietarios] = useState([]);
+
+  useEffect(() => {
+    const fetchPropietarios = async () => {
+      const token = localStorage.getItem('access_token');
+      
+      try {
+        const response = await fetch('http://192.168.1.109:8000/admin/ownerlist', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          
+          const formattedData = data.map(owner => ({
+            id: owner.id,
+            firstName: owner.first_name,
+            lastName: owner.last_name,
+            email: owner.email,
+            telefono: owner.phone,
+            ci: owner.ci,
+            apartament: owner.apartment,
+            piso: owner.floor,
+            torre: owner.tower,
+            status: owner.status || 'active', // Aseguramos un valor por defecto
+            cuotasAcumuladas: 0 
+          }));
+          
+          setPropietarios(formattedData);
+        } else {
+          console.error("Error al obtener la lista de propietarios:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error de red al conectar con el backend:", error);
+      }
+    };
+
+    fetchPropietarios();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // 1. Recuperamos el token almacenado al hacer login
     const token = localStorage.getItem('access_token');
     
     const payload = {
@@ -53,7 +93,6 @@ const handleSubmit = async (e) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // 2. AÑADIMOS EL TOKEN AQUÍ
           'Authorization': `Bearer ${token}` 
         },
         body: JSON.stringify(payload)
@@ -65,7 +104,7 @@ const handleSubmit = async (e) => {
         const newUser = {
           ...formData,
           id: data.id, 
-          status: 'Active', 
+          status: 'active', 
           cuotasAcumuladas: 0 
         };
         
@@ -88,6 +127,23 @@ const handleSubmit = async (e) => {
     }
   };
 
+  // Lógica combinada de filtrado (Búsqueda + Estatus)
+  const filteredPropietarios = propietarios.filter(user => {
+    // 1. Verificamos si coincide con el texto de búsqueda
+    const matchesSearch = 
+      user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.ci.includes(searchTerm);
+
+    // 2. Verificamos si coincide con el estatus seleccionado
+    const matchesStatus = 
+      filterStatus === 'all' || 
+      (user.status && user.status.toLowerCase() === filterStatus.toLowerCase());
+
+    // El usuario debe cumplir ambas condiciones para mostrarse en la tabla
+    return matchesSearch && matchesStatus;
+  });
+
   return (
     <div className="admin-container">
       {/* Barra de Herramientas */}
@@ -101,22 +157,26 @@ const handleSubmit = async (e) => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        
 
         <div className="toolbar-right">
-          <select className="filter-select">
+          {/* Select de filtro ahora controlado por React */}
+          <select 
+            className="filter-select"
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+          >
             <option value="all">All Status</option>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
           </select>
-          {/* Botón que abre el modal */}
+          
           <button className="btn-add" onClick={() => setIsModalOpen(true)}>
             <FiPlus /> Agregar
           </button>
         </div>
       </div>
 
-      {/* Tabla (sin cambios) */}
+      {/* Tabla */}
       <div className="table-responsive">
         <table className="admin-table">
           <thead>
@@ -131,7 +191,7 @@ const handleSubmit = async (e) => {
             </tr>
           </thead>
           <tbody>
-            {propietarios.map((user) => (
+            {filteredPropietarios.map((user) => (
               <tr key={user.id}>
                 <td className="col-name">{user.firstName} {user.lastName}</td>
                 <td>{user.email}</td>
@@ -139,7 +199,8 @@ const handleSubmit = async (e) => {
                 <td>{user.ci}</td>
                 <td>{user.torre}{user.piso}{user.apartament}</td>
                 <td>{user.cuotasAcumuladas === 0 ? 'No debts' : user.cuotasAcumuladas}</td>
-                <td>{user.status}</td>
+                {/* Capitalizamos la primera letra del status para que se vea mejor */}
+                <td>{user.status ? user.status.charAt(0).toUpperCase() + user.status.slice(1).toLowerCase() : 'Desconocido'}</td>
               </tr>
             ))}
           </tbody>
@@ -203,4 +264,4 @@ const handleSubmit = async (e) => {
   );
 };
 
-export default AdminPropietarios;   
+export default AdminPropietarios;
