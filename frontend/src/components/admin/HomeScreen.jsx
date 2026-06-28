@@ -77,13 +77,7 @@ const HomeScreen = () => {
           <img src="/user/port.png" alt="Render de Portón" className="gate-image" />
         </div>
 
-        {/* Sección Inferior: Textos y Notificación */}
-        <div className="home-footer">
-          <div className="footer-info">
-            <h2>Narayola II</h2>
-            <p>GMS 4G Activo</p>
-          </div>
-        </div>
+
 
       </div>
 

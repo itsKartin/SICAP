@@ -102,7 +102,7 @@
 
 /* Footer (Barra inferior con el logo) */
 .admin-footer {
-  height: 55px; /* Barra inferior un poco más delgada */
+  height: 40px; /* Barra inferior un poco más delgada */
   background: linear-gradient(to top, #000000, #151515);
   border-top: 1px solid #222222;
   display: flex;

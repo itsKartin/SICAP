@@ -6,6 +6,7 @@
   display: flex;
   flex-direction: row; /* Coloca el contenido principal y el panel lado a lado */
   gap: 3rem; /* Separación entre la izquierda y el panel */
+  height: 100vh;
 
 
   padding: 2.5rem 5rem;
@@ -98,7 +99,7 @@
 }
 
 .gate-image { 
-  max-width: 55%; /*here bro*/
+  max-width: 50%; /*here bro*/
   object-fit: contain;
   opacity: 0.9;
   filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.5));
