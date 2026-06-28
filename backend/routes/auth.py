@@ -7,7 +7,7 @@ from ..auth import verify_password, create_token
 
 router = APIRouter()
 
-#Inicio de sesion en base de datos
+#Login in the database
 def get_db():
     db = SessionLocal()
     try:
@@ -18,12 +18,15 @@ def get_db():
 #This is a the url that comes after the one in main.py
 @router.post("/login")
 def login(email:str, password:str, db: Session = Depends(get_db)):
-    user = db.query(Owner).filter(Owner.email == email).first()
 
-    if not user:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+    admin = db.query(Admin).filter(Admin.email == email).first()
+    if admin and verify_password(password, admin.password):
+        token = create_token({"id": admin.id, "email": admin.email, "role": "admin"})
+        return {"acces_token": token, "role": "admin"}
+
+    user = db.query(Owner).filter(Owner.email == email).first()
+    if user and verify_password(password, user.password):
+        token = create_token("id": user.id, "email": user.email, "role": "owner")
+        return {"acces_token": token, "role": "owner"}
     
-    if not verify_password(password, user.password):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
-    
-    return {"access_token": create_token({"id":user.id, "email": user.email})}
+    raise HTTPException(status_code=401, detail="Invalid credentials")
