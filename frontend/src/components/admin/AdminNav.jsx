@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 // Importamos los nuevos íconos más acordes al contexto
-import { LayoutGrid, Users, CreditCard, Ban, ArrowUpRight } from 'lucide-react';
+import { LayoutGrid, Users, CreditCard, Ban, ArrowUpRight, CarFront } from 'lucide-react';
 import { NavLink, Outlet } from 'react-router-dom'; 
-import './AdminNav.css';
+import './css/AdminNav.css';
 
 const AdminNav = () => {
   // Estado para controlar el menú de exportación
@@ -66,6 +66,18 @@ const AdminNav = () => {
                 <span>Bloqueados</span>
               </NavLink>
             </li>
+
+
+               <li>
+              <NavLink 
+                to="/admin/manual-access" 
+                className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
+              >
+                <CarFront size={18} />
+                <span>Accesos manuales</span>
+              </NavLink>
+            </li>
+
           </ul>
 
           {/* Botón de Exportar inferior con Menú Desplegable */}

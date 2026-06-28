@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './AdminPropietarios.css';
+import './css/AdminPropietarios.css';
 import { 
   FiPlus, FiSearch, FiUser, FiAtSign, FiPhone, FiHash, FiHome, FiFileText, FiActivity, FiX
 } from 'react-icons/fi';
@@ -30,20 +30,70 @@ const AdminPropietarios = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
-    // Aquí conectarías con tu base de datos.
-    // Por ahora, simularemos agregarlo a la tabla:
-    const newUser = {
-      ...formData,
-      id: propietarios.length + 1,
-      status: 'Active', // Estado por defecto
-      cuotasAcumuladas: 0 // Cuotas por defecto
-    };
     
-    setPropietarios([...propietarios, newUser]);
-    setIsModalOpen(false); // Cerrar modal
-    setFormData({ firstName: '', lastName: '', email: '', telefono: '', ci: '', apartament: '', piso: '', torre: '' }); // Limpiar formulario
+    // 1. Mapeamos los datos del estado de React al esquema que espera FastAPI
+    const payload = {
+      firstname: formData.firstName,
+      lastname: formData.lastName,
+      email: formData.email,
+      phone: formData.telefono,
+      ci: formData.ci,
+      apartment: formData.apartament,
+      floor: formData.piso,
+      tower: formData.torre,
+      passw: formData.ci // Usamos la cédula como contraseña
+    };
+
+    try {
+      // 2. Realizamos la petición HTTP POST al backend
+      // NOTA: Reemplaza la URL base por la tuya. Como indicaste que la ruta
+      // viene después del main.py, asegúrate de colocar el prefijo correcto (ej: /admin/newowner o /api/newowner)
+      const response = await fetch('http://localhost:8000/admin/newowner', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        // 3. Si es exitoso, actualizamos la tabla del frontend usando el ID que devuelve la base de datos
+        const newUser = {
+          ...formData,
+          id: data.id, 
+          status: 'Active', 
+          cuotasAcumuladas: 0 
+        };
+        
+        setPropietarios([...propietarios, newUser]);
+        setIsModalOpen(false); // Cierra el modal
+        
+        // Limpiamos el formulario
+        setFormData({ 
+          firstName: '', 
+          lastName: '', 
+          email: '', 
+          telefono: '', 
+          ci: '', 
+          apartament: '', 
+          piso: '', 
+          torre: '' 
+        });
+        
+        alert("Propietario creado con éxito");
+      } else {
+        // Manejo de errores que devuelva FastAPI (ej: un 400 Bad Request o email duplicado)
+        const errorData = await response.json();
+        alert(`Error al crear propietario: ${errorData.detail || 'Revisa los datos enviados'}`);
+      }
+    } catch (error) {
+      console.error("Error al conectar con el backend:", error);
+      alert("Error de red: No se pudo conectar con el servidor.");
+    }
   };
 
   return (

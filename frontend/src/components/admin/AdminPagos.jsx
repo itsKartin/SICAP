@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowUpDown, MoreVertical, X, DollarSign, Calendar, Receipt, Activity, User } from 'lucide-react';
-import './AdminPagos.css';
+import './css/AdminPagos.css';
 
 // Modal component rediseñado basado en la referencia
 const PaymentDetailsModal = ({ payment, isOpen, onClose, onApprove, onReject }) => {
