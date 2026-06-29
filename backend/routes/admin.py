@@ -4,12 +4,12 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from fpdf import FPDF
-from datetime import date
+from datetime import date as date_type
 from ..database import SessionLocal
 from ..models import Admin, Owner, Payment, MonthlyDue
 from ..auth import hash_password, get_current_admin
-from ..schemas import OwnerCreate, OwnerOut, PaymentOut, VerifyPaymentResponse
-from ..services.exchange import usd_value
+from ..schemas import OwnerCreate, OwnerOut, PaymentOut, VerifyPaymentResponse, GenerateDuesRequest
+from ..services.exchange import get_rate
 from ..services.sms import block, add
 
 router = APIRouter()
@@ -75,23 +75,18 @@ def pending_payments(db: Session = Depends(get_db), admin=Depends(get_current_ad
 def paymentverify(payment_id: int, db: Session = Depends(get_db), admin=Depends(get_current_admin)):
     payment = db.query(Payment).filter(Payment.id == payment_id).first()
     if not payment:
-        raise HTTPException(status_code=404, detail="Payment not found")
+        raise HTTPException(status_code=404, detail="Pago no encontrado")
     if payment.status == "paid":
-        raise HTTPException(status_code=400, detail="Payment already verified")
+        raise HTTPException(status_code=400, detail="Este pago ya fue verificado")
 
     owner = db.query(Owner).filter(Owner.id == payment.owner_id).first()
     if not owner:
-        raise HTTPException(status_code=404, detail="Owner not found")
+        raise HTTPException(status_code=404, detail="Propietario no encontrado")
 
-    try:
-        rate = usd_value()
-    except Exception:
-        raise HTTPException(status_code=503, detail="Could not fetch BCV exchange rate")
-
-    amount_usd = round(payment.amount_bs / rate, 2)
+    amount_usd = payment.amount_usd
+    rate = payment.exchange_rate
 
     payment.status = "paid"
-    payment.exchange_rate = rate
     payment.admin_id = admin["id"]
 
     pending_dues = (
@@ -128,7 +123,6 @@ def paymentverify(payment_id: int, db: Session = Depends(get_db), admin=Depends(
     ).scalar() or 0.0
 
     owner_unblocked = False
-
     if pending_dues_count < BLOCK_THRESHOLD and owner.status == "inactive":
         try:
             add(owner.phone)
@@ -140,7 +134,7 @@ def paymentverify(payment_id: int, db: Session = Depends(get_db), admin=Depends(
     db.commit()
 
     return VerifyPaymentResponse(
-        message="Payment verified successfully",
+        message="Pago verificado correctamente",
         payment_id=payment.id,
         owner_id=owner.id,
         amount_bs=payment.amount_bs,
@@ -153,6 +147,67 @@ def paymentverify(payment_id: int, db: Session = Depends(get_db), admin=Depends(
         overpayment_usd=overpayment
     )
 
+@router.post("/generate-dues")
+def generate_dues(body: GenerateDuesRequest, db: Session = Depends(get_db), admin=Depends(get_current_admin)):
+    today = date_type.today()
+    current_month = date_type(today.year, today.month, 1)
+
+    owners = db.query(Owner).filter(Owner.status == "active").all()
+
+    if not owners:
+        raise HTTPException(status_code=404, detail="No hay propietarios activos")
+
+    dues_created = []
+    owners_blocked = []
+
+    for owner in owners:
+        existing = db.query(MonthlyDue).filter(
+            MonthlyDue.owner_id == owner.id,
+            MonthlyDue.month == current_month
+        ).first()
+
+        if not existing:
+            new_due = MonthlyDue(
+                owner_id=owner.id,
+                amount_usd=body.amount_usd,
+                month=current_month,
+                due_date=body.due_date,
+                status="pending"
+            )
+            db.add(new_due)
+            dues_created.append(owner.id)
+
+        pending_count = db.query(func.count(MonthlyDue.id)).filter(
+            MonthlyDue.owner_id == owner.id,
+            MonthlyDue.status == "pending"
+        ).scalar() or 0
+
+        if pending_count >= BLOCK_THRESHOLD and owner.status == "active":
+            try:
+                block(owner.phone)
+            except Exception:
+                pass
+            owner.status = "inactive"
+            owners_blocked.append(owner.id)
+
+    db.commit()
+
+    return {
+        "message": "Mensualidades generadas y deudas verificadas",
+        "dues_created": len(dues_created),
+        "owners_blocked": owners_blocked
+    }
+
+
+MESES = {
+    1: "enero", 2: "febrero", 3: "marzo", 4: "abril",
+    5: "mayo", 6: "junio", 7: "julio", 8: "agosto",
+    9: "septiembre", 10: "octubre", 11: "noviembre", 12: "diciembre"
+}
+
+def fecha_hoy():
+    hoy = date_type.today()
+    return f"{hoy.day} de {MESES[hoy.month]} de {hoy.year}"
 
 @router.get("/owners-report/pdf")
 def owners_pdf(db: Session = Depends(get_db), admin=Depends(get_current_admin)):
@@ -163,7 +218,7 @@ def owners_pdf(db: Session = Depends(get_db), admin=Depends(get_current_admin)):
     pdf.set_font("Helvetica", "B", 16)
     pdf.cell(0, 10, "Reporte de Propietarios", new_x="LMARGIN", new_y="NEXT", align="C")
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(0, 6, f"Generado el: {date.today().strftime('%d de %B de %Y')}", new_x="LMARGIN", new_y="NEXT", align="C")
+    pdf.cell(0, 6, f"Generado el: {fecha_hoy()}", new_x="LMARGIN", new_y="NEXT", align="C")
     pdf.ln(6)
 
     headers = ["Nombre", "CI", "Apto", "Piso", "Torre", "Estatus"]

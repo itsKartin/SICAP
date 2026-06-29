@@ -35,6 +35,7 @@ class Payment(Base):
     owner_id = Column(ForeignKey("owners.id"), nullable=False)
     admin_id = Column(ForeignKey("administrators.id"), nullable=True)
     amount_bs = Column(Float, nullable=False)
+    amount_usd = Column(Float, nullable=True)
     payment_date = Column(Date, nullable=False)
     receipt = Column(String(100), nullable=False)
     exchange_rate = Column(Float, nullable=False)
