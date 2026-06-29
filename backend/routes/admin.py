@@ -198,6 +198,17 @@ def generate_dues(body: GenerateDuesRequest, db: Session = Depends(get_db), admi
         "owners_blocked": owners_blocked
     }
 
+
+MESES = {
+    1: "enero", 2: "febrero", 3: "marzo", 4: "abril",
+    5: "mayo", 6: "junio", 7: "julio", 8: "agosto",
+    9: "septiembre", 10: "octubre", 11: "noviembre", 12: "diciembre"
+}
+
+def fecha_hoy():
+    hoy = date_type.today()
+    return f"{hoy.day} de {MESES[hoy.month]} de {hoy.year}"
+
 @router.get("/owners-report/pdf")
 def owners_pdf(db: Session = Depends(get_db), admin=Depends(get_current_admin)):
     owners = db.query(Owner).order_by(Owner.tower, Owner.floor, Owner.apartment).all()
@@ -207,7 +218,7 @@ def owners_pdf(db: Session = Depends(get_db), admin=Depends(get_current_admin)):
     pdf.set_font("Helvetica", "B", 16)
     pdf.cell(0, 10, "Reporte de Propietarios", new_x="LMARGIN", new_y="NEXT", align="C")
     pdf.set_font("Helvetica", "", 10)
-    pdf.cell(0, 6, f"Generado el: {date.today().strftime('%d de %B de %Y')}", new_x="LMARGIN", new_y="NEXT", align="C")
+    pdf.cell(0, 6, f"Generado el: {fecha_hoy()}", new_x="LMARGIN", new_y="NEXT", align="C")
     pdf.ln(6)
 
     headers = ["Nombre", "CI", "Apto", "Piso", "Torre", "Estatus"]
