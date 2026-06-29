@@ -47,7 +47,6 @@ body {
   transition: all 0.3s ease;
 }
 
-/* NUEVA CLASE PARA EL ESTADO INACTIVO */
 .user-status-badge.inactive {
   background-color: rgba(255, 77, 77, 0.1);
   color: #ff4d4d;
@@ -96,7 +95,6 @@ body {
   transition: all 0.3s ease;
 }
 
-/* NUEVA CLASE PARA LA BASE INACTIVA */
 .gate-base.inactive {
   border-top: 2px solid #ff4d4d;
   box-shadow: 0 -5px 30px rgba(255, 77, 77, 0.2);
@@ -235,7 +233,7 @@ body {
   line-height: 1.3;
 }
 
-/* Acciones (Botones) */
+/* --- BOTONES DE ACCIÓN (Pagos y SOS) --- */
 .actions-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -276,34 +274,61 @@ body {
   color: #00e676;
 }
 
+/* --- ESTILOS DEL NUEVO TOGGLE SOS --- */
 .sos-btn {
   justify-content: space-between;
-  padding: 16px 20px;
+  padding: 12px 16px; /* Ajuste para equilibrar el texto y el slider */
+}
+
+.sos-label-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
 }
 
 .sos-text {
   color: #ff4d4d;
   font-size: 1.1rem;
   font-weight: 600;
+  line-height: 1;
 }
 
-.toggle-switch {
-  width: 44px;
+.sos-subtext {
+  font-size: 0.65rem;
+  color: #888;
+  font-weight: 400;
+}
+
+.sos-toggle {
+  width: 48px;
   height: 26px;
-  background-color: #444;
-  border-radius: 20px;
+  background-color: #444; 
+  border-radius: 30px;
   position: relative;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  flex-shrink: 0;
 }
 
-.toggle-switch::after {
-  content: '';
-  position: absolute;
-  top: 3px;
-  right: 3px;
-  width: 20px;
-  height: 20px;
+.sos-toggle.active {
+  background-color: #00e676; /* Verde característico */
+}
+
+.sos-toggle-thumb {
+  width: 22px;
+  height: 22px;
   background-color: #fff;
   border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.sos-toggle.active .sos-toggle-thumb {
+  transform: translateX(22px);
 }
 
 /* --- NOTIFICACIONES SEPARADAS --- */
@@ -314,10 +339,8 @@ body {
   gap: 12px; 
   max-height: 220px; 
   overflow-y: auto;
-  
   -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
   mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
-  
   -ms-overflow-style: none;
   scrollbar-width: none;
   padding-bottom: 20px; 
@@ -335,7 +358,6 @@ body {
   border-radius: 16px;
   padding: 16px;
   border: 1px solid #2a2a2d;
-  
   opacity: 0;
   animation: cascadeFadeIn 0.5s ease forwards;
 }
@@ -481,20 +503,9 @@ body {
     align-items: center;
     padding-top: 20px;
   }
-
-  .dash-header {
-    grid-area: header;
-  }
-
-  .dash-hero {
-    grid-area: hero;
-  }
-
-  .dash-control-panel {
-    grid-area: panel;
-    margin-top: 0;
-  }
-
+  .dash-header { grid-area: header; }
+  .dash-hero { grid-area: hero; }
+  .dash-control-panel { grid-area: panel; margin-top: 0; }
   .dash-bottom-nav {
     grid-area: nav;
     position: relative;
@@ -693,7 +704,7 @@ body {
   font-family: inherit;
 }
 
-/* --- HISTORIAL DE PAGOS (NUEVO) --- */
+/* --- HISTORIAL DE PAGOS --- */
 .history-list {
   display: flex;
   flex-direction: column;
@@ -772,6 +783,47 @@ body {
   background-color: rgba(255, 77, 77, 0.15);
   color: #ff4d4d;
   border: 1px solid rgba(255, 77, 77, 0.3);
+}
+
+/* --- BOTONES DEL MODAL DE CONFIRMACIÓN SOS --- */
+.confirm-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.btn-cancel, .btn-danger {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s, background-color 0.2s;
+  font-size: 0.95rem;
+}
+
+.btn-cancel {
+  background-color: #333;
+  color: #fff;
+}
+
+.btn-danger {
+  background-color: #ff4d4d;
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background-color: #e6352b;
+}
+
+.btn-cancel:hover {
+  background-color: #444;
+}
+
+.btn-danger:disabled, .btn-cancel:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 @media (min-width: 850px) {

@@ -11,6 +11,11 @@ const DashboardUser = () => {
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [showPaymentsHistory, setShowPaymentsHistory] = useState(false);
   
+  // --- NUEVOS ESTADOS PARA EL PROTOCOLO SOS ---
+  const [isSosActive, setIsSosActive] = useState(false);
+  const [showSosConfirm, setShowSosConfirm] = useState(false);
+  const [isBlocking, setIsBlocking] = useState(false);
+  
   // Estados para el formulario de pago
   const [reference, setReference] = useState('');
   const [amountBsInput, setAmountBsInput] = useState(''); 
@@ -19,7 +24,7 @@ const DashboardUser = () => {
   // Tasa BCV (Se inicializa por defecto pero se actualizará con el backend)
   const [bcvRate, setBcvRate] = useState(36.5); 
 
-  // --- NUEVOS ESTADOS PARA LAS DEUDAS PENDIENTES (CONECTADO AL BACKEND) ---
+  // --- ESTADOS PARA LAS DEUDAS PENDIENTES ---
   const [pendingDebts, setPendingDebts] = useState([]);
   const [isLoadingDebt, setIsLoadingDebt] = useState(false);
 
@@ -32,7 +37,7 @@ const DashboardUser = () => {
     fetchDebtSummary();
   }, []);
 
-  // Función para llamar a la API y traer las deudas pendientes del usuario
+  // Función para llamar a la API y traer las deudas pendientes
   const fetchDebtSummary = async () => {
     setIsLoadingDebt(true);
     const token = localStorage.getItem('access_token');
@@ -51,16 +56,11 @@ const DashboardUser = () => {
       }
 
       const data = await response.json();
-      console.log("Datos de deudas:", data);
-      
-      // Guardamos la lista de deudas pendientes (pending_dues) en el estado
       setPendingDebts(data.pending_dues || []);
       
-      // Aprovechamos de actualizar la tasa BCV real del backend si viene en la respuesta
       if (data.exchange_rate) {
         setBcvRate(data.exchange_rate);
       }
-      
     } catch (error) {
       console.error("Error al cargar deudas pendientes:", error);
     } finally {
@@ -68,7 +68,7 @@ const DashboardUser = () => {
     }
   };
 
-  // Función para llamar a tu API y traer los pagos reales
+  // Función para llamar a tu API y traer los pagos
   const fetchPaymentHistory = async () => {
     setIsLoadingHistory(true);
     const token = localStorage.getItem('access_token'); 
@@ -87,9 +87,7 @@ const DashboardUser = () => {
       }
 
       const data = await response.json();
-      console.log("Datos de pagos:", data);
       setPaymentHistory(data); 
-      
     } catch (error) {
       console.error("Error al cargar historial:", error);
     } finally {
@@ -97,7 +95,47 @@ const DashboardUser = () => {
     }
   };
 
-  // Manejadores de eventos
+  // --- FUNCIONES DEL PROTOCOLO SOS ---
+  const handleSosToggleClick = () => {
+    // Solo abre el modal si el SOS no está activo aún
+    if (!isSosActive) {
+      setShowSosConfirm(true);
+    }
+  };
+
+  const confirmSosProtocol = async () => {
+    setIsBlocking(true);
+    const token = localStorage.getItem('access_token'); 
+    
+    try {
+      const response = await fetch('http://192.168.1.109:8000/owners/block-number', { 
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        }
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setIsSosActive(true);
+        setShowSosConfirm(false);
+        // Opcional: Desactivar al usuario localmente en la UI
+        setIsActive(false); 
+        alert(data.message || "Protocolo SOS activado con éxito."); 
+      } else {
+        alert(data.detail || "Error al activar el protocolo SOS.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Error de conexión al activar el protocolo SOS.");
+    } finally {
+      setIsBlocking(false);
+    }
+  };
+
+  // Manejadores de eventos de Modales
   const handleOpenPending = () => setShowPendingMenu(true);
   
   const handleOpenPaymentForm = () => {
@@ -116,14 +154,13 @@ const DashboardUser = () => {
     setShowPendingMenu(false);
     setShowPaymentForm(false);
     setShowPaymentsHistory(false);
+    setShowSosConfirm(false); // Cierra también el de SOS si se hace clic fuera
     setReference('');
     setAmountBsInput(''); 
   };
 
-  // Suma total de todas las deudas pendientes (en Dólares usando amount_usd del backend)
   const totalToPay = pendingDebts.reduce((sum, debt) => sum + debt.amount_usd, 0);
 
-  // Lógica para enviar el pago al backend
   const handleSubmitPayment = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -160,8 +197,6 @@ const DashboardUser = () => {
       
       alert(data.message || "¡Pago reportado exitosamente!");
       handleCloseModals();
-      
-      // Recargamos las deudas pendientes ya que se acaba de reportar un pago
       fetchDebtSummary();
       
     } catch (error) {
@@ -172,7 +207,6 @@ const DashboardUser = () => {
     }
   };
 
-  // Función auxiliar para traducir el status de la base de datos
   const getStatusText = (status) => {
     switch(status?.toLowerCase()) {
       case 'pending': return 'PENDIENTE';
@@ -238,9 +272,14 @@ const DashboardUser = () => {
             Ver mis Pagos
           </button>
 
-          <div className="action-btn sos-btn">
-            <span className="sos-text">SOS</span>
-            <div className="toggle-switch"></div>
+          {/* NUEVO BOTÓN SOS CON SLIDER */}
+          <div className="action-btn sos-btn" onClick={handleSosToggleClick}>
+            <div className="sos-label-col">
+              <span className="sos-text">SOS</span>
+            </div>
+            <div className={`sos-toggle ${isSosActive ? 'active' : ''}`}>
+              <div className="sos-toggle-thumb"></div>
+            </div>
           </div>
         </div>
 
@@ -403,6 +442,42 @@ const DashboardUser = () => {
                   </div>
                 ))
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal 4: CONFIRMACIÓN SOS */}
+      {showSosConfirm && (
+        <div className="modal-overlay" onClick={handleCloseModals}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3 style={{ color: '#ff4d4d' }}>⚠️ Protocolo de Seguridad</h3>
+              <button className="close-btn" onClick={() => setShowSosConfirm(false)}>✕</button>
+            </div>
+            
+            <div style={{ padding: '20px 0', textAlign: 'center', lineHeight: '1.5' }}>
+              <p>¿Está seguro que desea activar el <strong>protocolo SOS</strong> para desactivar su número de inmediato?</p>
+              <p style={{ fontSize: '0.85rem', color: '#888', marginTop: '10px' }}>
+                Esta acción bloqueará su acceso temporalmente por seguridad.
+              </p>
+            </div>
+
+            <div className="confirm-actions">
+              <button 
+                className="btn-cancel" 
+                onClick={() => setShowSosConfirm(false)}
+                disabled={isBlocking}
+              >
+                Cancelar
+              </button>
+              <button 
+                className="btn-danger" 
+                onClick={confirmSosProtocol}
+                disabled={isBlocking}
+              >
+                {isBlocking ? 'Activando...' : 'Sí, Activar SOS'}
+              </button>
             </div>
           </div>
         </div>

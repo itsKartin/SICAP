@@ -1,10 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowUpDown, MoreVertical, X, DollarSign, Calendar, Receipt, Activity, User } from 'lucide-react';
 import './css/AdminPagos.css';
 
-// Modal component rediseñado basado en la referencia
+// Modal component rediseñado
 const PaymentDetailsModal = ({ payment, isOpen, onClose, onApprove, onReject }) => {
   if (!isOpen || !payment) return null;
+
+  // Adaptamos las variables para que soporte tanto los datos quemados de la tabla principal
+  // como los datos reales que vienen del backend
+  const nombre = payment.owner_name || payment.usuario || payment.nombre;
+  const monto = payment.amount_bs ? `${payment.amount_bs} bs` : payment.monto;
+  const fecha = payment.payment_date || payment.fecha;
+  const recibo = payment.receipt || payment.recibo || payment.ref;
 
   return (
     <div className="modal-overlay">
@@ -19,22 +26,21 @@ const PaymentDetailsModal = ({ payment, isOpen, onClose, onApprove, onReject }) 
         </div>
         
         <h2 className="modal-title-centered">Detalles del Pago</h2>
-        <p className="modal-subtitle-centered">Pago de {payment.nombre}</p>
+        <p className="modal-subtitle-centered">Pago de {nombre}</p>
 
         <div className="payment-details-grid">
           <div className="detail-item">
             <span className="detail-label">Monto:</span>
-            <span className="detail-value-highlight">{payment.monto}</span>
+            <span className="detail-value-highlight">{monto}</span>
           </div>
           <div className="detail-item">
             <span className="detail-label">Fecha:</span>
-            <span className="detail-value">{payment.fecha}</span>
+            <span className="detail-value">{fecha}</span>
           </div>
           <div className="detail-item">
             <span className="detail-label">Referencia:</span>
-            <span className="detail-value">{payment.ref || payment.recibo}</span>
+            <span className="detail-value">{recibo}</span>
           </div>
-          {/* Campo de Método de Pago eliminado */}
         </div>
 
         <div className="modal-actions">
@@ -53,23 +59,42 @@ const PaymentDetailsModal = ({ payment, isOpen, onClose, onApprove, onReject }) 
 const AdminPagos = () => {
   const [selectedPayment, setSelectedPayment] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [pendientes, setPendientes] = useState([]); // Estado para guardar los pagos pendientes desde la API
 
+  // Datos de ejemplo para la tabla principal
   const pagos = [
     { id: 1, monto: '17.1515 bs', fecha: '4 Abr 2026', recibo: 'Ref#1551', estado: 'Completado', usuario: 'Carlos Lugo' },
     { id: 2, monto: '17.1515 bs', fecha: '4 Abr 2026', recibo: 'Ref#1551', estado: 'Completado', usuario: 'Giuseppe Papa' },
     { id: 3, monto: '25.0000 bs', fecha: '5 Abr 2026', recibo: 'Ref#1552', estado: 'Pendiente', usuario: 'Ana Martínez' },
   ];
 
-  const pendientes = [
-    { id: 1, nombre: 'Robert Fox', rol: 'Team Leader', ref: 'Ref#1001', monto: '10.50 bs', fecha: '12 Abr 2026', metodo: 'Pago Móvil Banesco' },
-    { id: 2, nombre: 'Theresa Webb', rol: 'Team Leader', ref: 'Ref#1002', monto: '15.00 bs', fecha: '13 Abr 2026', metodo: 'Transferencia Mercantil' },
-    { id: 3, nombre: 'Jerome Bell', rol: 'Ethical Hacker', ref: 'Ref#1003', monto: '22.30 bs', fecha: '13 Abr 2026', metodo: 'Pago Móvil Provincial' },
-    { id: 4, nombre: 'Dianne Russell', rol: 'Scrum Master', ref: 'Ref#1004', monto: '18.75 bs', fecha: '14 Abr 2026', metodo: 'Transferencia BNC' },
-    { id: 5, nombre: 'Cody Fisher', rol: 'UI/UX Designer', ref: 'Ref#1005', monto: '20.00 bs', fecha: '14 Abr 2026', metodo: 'Pago Móvil Banesco' },
-    { id: 6, nombre: 'Esther Howard', rol: 'Project Manager', ref: 'Ref#1006', monto: '25.50 bs', fecha: '15 Abr 2026', metodo: 'Transferencia Mercantil' },
-    { id: 7, nombre: 'Brooklyn Simmons', rol: 'Software Engineer', ref: 'Ref#1007', monto: '19.20 bs', fecha: '15 Abr 2026', metodo: 'Pago Móvil Provincial' },
-    { id: 8, nombre: 'Leslie Alexander', rol: 'Data Analyst', ref: 'Ref#1008', monto: '21.00 bs', fecha: '16 Abr 2026', metodo: 'Transferencia BNC' },
-  ];
+  // Fetch para obtener los pagos pendientes usando el token
+  useEffect(() => {
+    const fetchPendientes = async () => {
+      const token = localStorage.getItem('access_token');
+      
+      try {
+        const response = await fetch('http://192.168.1.109:8000/admin/pending-payments', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setPendientes(data); // Guardamos la data del backend en el estado
+        } else {
+          console.error("Error al obtener los pagos pendientes:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error de conexión:", error);
+      }
+    };
+
+    fetchPendientes();
+  }, []);
 
   const openPaymentModal = (payment) => {
     setSelectedPayment(payment);
@@ -81,9 +106,43 @@ const AdminPagos = () => {
     setSelectedPayment(null);
   };
 
-  const approvePayment = (paymentId) => {
-    console.log(`Pago ${paymentId} verificado`);
-    closePaymentModal();
+const approvePayment = async (paymentId) => {
+    // 1. Obtenemos el token para la autorización
+    const token = localStorage.getItem('access_token');
+    
+    try {
+      // 2. Hacemos la petición POST a la ruta de verificación
+      const response = await fetch(`http://192.168.1.109:8000/admin/payment-verification/${paymentId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Pago verificado exitosamente:", data);
+        
+        // 3. Actualizamos la lista de pendientes para que el pago desaparezca de la UI
+        setPendientes((prevPendientes) => 
+          prevPendientes.filter((pago) => pago.id !== paymentId)
+        );
+        
+        alert("Pago verificado correctamente.");
+      } else {
+        // Manejo de errores desde el backend (ej. pago ya verificado o no encontrado)
+        const errorData = await response.json();
+        console.error("Error al verificar el pago:", errorData.detail);
+        alert(`Error: ${errorData.detail}`);
+      }
+    } catch (error) {
+      console.error("Error de conexión:", error);
+      alert("Hubo un error de conexión al intentar verificar el pago.");
+    } finally {
+      // 4. Cerramos el modal independientemente del resultado
+      closePaymentModal();
+    }
   };
 
   const rejectPayment = (paymentId) => {
@@ -126,7 +185,8 @@ const AdminPagos = () => {
               <MoreVertical size={16} color="#888" style={{ cursor: 'pointer' }} />
             </div>
             <div className="balance-info">
-              <h2 className="balance-total">12</h2>
+              {/* Contador dinámico basado en la respuesta de la API */}
+              <h2 className="balance-total">{pendientes.length}</h2>
               <span className="balance-badge">+5 Hoy</span>
             </div>
             <div className="balance-chart-container">
@@ -163,7 +223,7 @@ const AdminPagos = () => {
               <User size={16} /> Usuario
             </div>
 
-                <div className="modern-header-cell">
+            <div className="modern-header-cell">
               <Activity size={16} /> Estado
             </div>
           </div>
@@ -195,20 +255,27 @@ const AdminPagos = () => {
         
         <div className="pendientes-list-wrapper">
           <div className="pendientes-list">
-            {pendientes.map((persona) => (
-              <div className="pendiente-card" key={persona.id} onClick={() => openPaymentModal(persona)}>
-                <div className="pendiente-info">
-                  <img src="/admin/User.png" alt="Perfil" className="pendiente-avatar" />
-                  <div className="pendiente-text">
-                    <p className="pendiente-name">{persona.nombre}</p>
-                    <p className="pendiente-role">{persona.rol}</p>
+            {pendientes.length > 0 ? (
+              pendientes.map((pago) => (
+                <div className="pendiente-card" key={pago.id} onClick={() => openPaymentModal(pago)}>
+                  <div className="pendiente-info">
+                    <img src="/admin/User.png" alt="Perfil" className="pendiente-avatar" />
+                    <div className="pendiente-text">
+                      {/* Adaptado a los campos devueltos por tu backend */}
+                      <p className="pendiente-name">{pago.owner_name}</p>
+                      <p className="pendiente-role">Apto: {pago.owner_tower}{pago.owner_floor}{pago.owner_apartment}</p>
+                    </div>
                   </div>
+                  <button className="btn-more" onClick={(e) => { e.stopPropagation(); openPaymentModal(pago); }}>
+                    <MoreVertical size={16} color="#888" />
+                  </button>
                 </div>
-                <button className="btn-more" onClick={(e) => { e.stopPropagation(); openPaymentModal(persona); }}>
-                  <MoreVertical size={16} color="#888" />
-                </button>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p style={{ color: '#888', textAlign: 'center', marginTop: '20px' }}>
+                No hay pagos pendientes.
+              </p>
+            )}
           </div>
         </div>
       </div>

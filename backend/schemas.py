@@ -81,6 +81,8 @@ class PaymentOut(BaseModel): #Lista de pagos /pending-payments
     status: str
     owner_name: str
     owner_apartment: str
+    owner_tower: str 
+    owner_floor: str
 
 class VerifyPaymentResponse(BaseModel):  #Verificacion de pagos /payment-verification/{payment_id}
     message: str
