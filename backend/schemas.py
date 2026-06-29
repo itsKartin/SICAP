@@ -20,6 +20,7 @@ class PaymentHistoryItem(BaseModel):
     status: str
     amount_usd: Optional[float] = None
     exchange_rate: Optional[float] = None
+    receipt: Optional[str] = None
 
     class Config:
         from_attributes = True

@@ -20,12 +20,10 @@ const AdminNav = () => {
     };
   }, []);
 
-const handleDownloadUsersPDF = async () => {
+  const handleDownloadUsersPDF = async () => {
     try {
-
-      //obtener token
+      // obtener token
       const token = localStorage.getItem('access_token');
-
       
       const response = await fetch('http://192.168.1.109:8000/admin/owners-report/pdf', {
         method: 'GET',
@@ -42,11 +40,10 @@ const handleDownloadUsersPDF = async () => {
       // convertir a archivo binario
       const blob = await response.blob();
       
-      //url temporal 
+      // url temporal 
       const url = window.URL.createObjectURL(blob);
       
       // new element <a> para descargar el archivo
-
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', 'reporte_propietarios.pdf');
@@ -62,6 +59,58 @@ const handleDownloadUsersPDF = async () => {
       
     } catch (error) {
       console.error('Hubo un problema descargando el PDF:', error);
+    }
+  };
+
+  // Función para conectar con POST /admin/generate-dues
+  const handleGenerateDues = async () => {
+    // Pedimos los datos al usuario mediante prompts
+    const amountInput = window.prompt("Ingrese el monto de la mensualidad (USD):", "5");
+    if (amountInput === null) return; // Si el usuario cancela
+    
+    const amount = parseFloat(amountInput);
+    if (isNaN(amount) || amount <= 0) {
+      alert("Por favor, ingrese un monto válido.");
+      return;
+    }
+
+    // Sugerimos la fecha de hoy por defecto
+    const defaultDate = new Date().toISOString().split('T')[0];
+    const dueDate = window.prompt("Ingrese la fecha de vencimiento (YYYY-MM-DD):", defaultDate);
+    if (!dueDate) return; // Si el usuario cancela
+
+    try {
+      const token = localStorage.getItem('access_token');
+
+      const response = await fetch('http://192.168.1.109:8000/admin/generate-dues', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          amount_usd: amount,
+          due_date: dueDate
+        })
+      });
+
+      if (!response.ok) {
+        // Intentamos obtener el detalle del error desde el backend
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || `Error del servidor: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      // Mostramos el resultado de la operación
+      alert(`${data.message}\nDeudas creadas: ${data.dues_created}\nPropietarios bloqueados: ${data.owners_blocked.length}`);
+      
+      // Cerramos el menú
+      setIsExportOpen(false); 
+
+    } catch (error) {
+      console.error('Hubo un problema generando la deuda:', error);
+      alert(`Error al generar la deuda: ${error.message}`);
     }
   };
 
@@ -109,6 +158,8 @@ const handleDownloadUsersPDF = async () => {
                 <button className="export-option" onClick={handleDownloadUsersPDF}>Todos los usuarios</button>
                 <button className="export-option">Todos los pagos</button>
                 <button className="export-option">Accesos manuales</button>
+                {/* Botón conectado a la función handleGenerateDues */}
+                <button className="export-option" onClick={handleGenerateDues}>Generar deuda</button>
               </div>
             )}
 

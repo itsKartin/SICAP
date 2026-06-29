@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Zap, MapPin, MoreHorizontal, Wallet, CircleCheck } from 'lucide-react';
 import './DashboardUser.css';
 
@@ -10,21 +10,92 @@ const DashboardUser = () => {
   const [showPendingMenu, setShowPendingMenu] = useState(false);
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [showPaymentsHistory, setShowPaymentsHistory] = useState(false);
+  
+  // Estados para el formulario de pago
   const [reference, setReference] = useState('');
+  const [amountBsInput, setAmountBsInput] = useState(''); 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Tasa BCV (Se inicializa por defecto pero se actualizará con el backend)
+  const [bcvRate, setBcvRate] = useState(36.5); 
 
-  // Estado con la lista de deudas pendientes
-  const [pendingDebts] = useState([
-    { id: 1, month: 'Febrero 2026', amount: 15.00 },
-    { id: 2, month: 'Marzo 2026', amount: 15.00 }
-  ]);
+  // --- NUEVOS ESTADOS PARA LAS DEUDAS PENDIENTES (CONECTADO AL BACKEND) ---
+  const [pendingDebts, setPendingDebts] = useState([]);
+  const [isLoadingDebt, setIsLoadingDebt] = useState(false);
 
-  // Estado con el historial de pagos del usuario
-  const [paymentHistory] = useState([
-    { id: 101, date: '15 Ene 2026', ref: '45158932', status: 'Aprobado', amount: 15.00 },
-    { id: 102, date: '18 Dic 2025', ref: '98765432', status: 'Aprobado', amount: 15.00 },
-    { id: 103, date: '20 Nov 2025', ref: '12349876', status: 'Rechazado', amount: 15.00 },
-    { id: 104, date: '15 Oct 2025', ref: '56781234', status: 'Aprobado', amount: 15.00 }
-  ]);
+  // --- ESTADOS PARA EL HISTORIAL DE PAGOS ---
+  const [paymentHistory, setPaymentHistory] = useState([]);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+
+  // Efecto para cargar las deudas automáticamente al entrar al Dashboard
+  useEffect(() => {
+    fetchDebtSummary();
+  }, []);
+
+  // Función para llamar a la API y traer las deudas pendientes del usuario
+  const fetchDebtSummary = async () => {
+    setIsLoadingDebt(true);
+    const token = localStorage.getItem('access_token');
+
+    try {
+      const response = await fetch('http://192.168.1.109:8000/owners/my-debt', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al obtener las deudas pendientes');
+      }
+
+      const data = await response.json();
+      console.log("Datos de deudas:", data);
+      
+      // Guardamos la lista de deudas pendientes (pending_dues) en el estado
+      setPendingDebts(data.pending_dues || []);
+      
+      // Aprovechamos de actualizar la tasa BCV real del backend si viene en la respuesta
+      if (data.exchange_rate) {
+        setBcvRate(data.exchange_rate);
+      }
+      
+    } catch (error) {
+      console.error("Error al cargar deudas pendientes:", error);
+    } finally {
+      setIsLoadingDebt(false);
+    }
+  };
+
+  // Función para llamar a tu API y traer los pagos reales
+  const fetchPaymentHistory = async () => {
+    setIsLoadingHistory(true);
+    const token = localStorage.getItem('access_token'); 
+
+    try {
+      const response = await fetch('http://192.168.1.109:8000/owners/my-payments', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al obtener el historial de pagos');
+      }
+
+      const data = await response.json();
+      console.log("Datos de pagos:", data);
+      setPaymentHistory(data); 
+      
+    } catch (error) {
+      console.error("Error al cargar historial:", error);
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  };
 
   // Manejadores de eventos
   const handleOpenPending = () => setShowPendingMenu(true);
@@ -38,6 +109,7 @@ const DashboardUser = () => {
     setShowPendingMenu(false);
     setShowPaymentForm(false);
     setShowPaymentsHistory(true);
+    fetchPaymentHistory(); 
   };
 
   const handleCloseModals = () => {
@@ -45,18 +117,70 @@ const DashboardUser = () => {
     setShowPaymentForm(false);
     setShowPaymentsHistory(false);
     setReference('');
+    setAmountBsInput(''); 
   };
 
-  const handleSubmitPayment = (e) => {
+  // Suma total de todas las deudas pendientes (en Dólares usando amount_usd del backend)
+  const totalToPay = pendingDebts.reduce((sum, debt) => sum + debt.amount_usd, 0);
+
+  // Lógica para enviar el pago al backend
+  const handleSubmitPayment = async (e) => {
     e.preventDefault();
-    console.log("Pago reportado con referencia:", reference);
-    console.log("Deudas pagadas (IDs):", pendingDebts.map(d => d.id));
-    alert("¡Pago reportado exitosamente!");
-    handleCloseModals();
+    setIsSubmitting(true);
+
+    const parsedAmountBs = parseFloat(amountBsInput);
+
+    if (isNaN(parsedAmountBs) || parsedAmountBs <= 0) {
+      alert("Por favor, ingresa un monto válido mayor a cero.");
+      setIsSubmitting(false);
+      return;
+    }
+    
+    const token = localStorage.getItem('access_token');
+
+    try {
+      const response = await fetch('http://192.168.1.109:8000/owners/upload-payment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify({
+          receipt: reference,
+          amount_bs: parsedAmountBs 
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Hubo un error al procesar el pago.');
+      }
+
+      const data = await response.json();
+      
+      alert(data.message || "¡Pago reportado exitosamente!");
+      handleCloseModals();
+      
+      // Recargamos las deudas pendientes ya que se acaba de reportar un pago
+      fetchDebtSummary();
+      
+    } catch (error) {
+      console.error("Error al reportar pago:", error);
+      alert(error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  // Suma total de todas las deudas pendientes
-  const totalToPay = pendingDebts.reduce((sum, debt) => sum + debt.amount, 0);
+  // Función auxiliar para traducir el status de la base de datos
+  const getStatusText = (status) => {
+    switch(status?.toLowerCase()) {
+      case 'pending': return 'PENDIENTE';
+      case 'approved': return 'APROBADO';
+      case 'rejected': return 'RECHAZADO';
+      default: return status?.toUpperCase();
+    }
+  };
 
   return (
     <div className="dashboard-container">
@@ -93,7 +217,9 @@ const DashboardUser = () => {
           <div className="card pending-card clickable" onClick={handleOpenPending}>
             <p className="subtitle">Proximo corte<br/>en 30 dias</p>
             <div className="pending-content">
-              <span className="highlight-number">{pendingDebts.length}</span>
+              <span className="highlight-number">
+                {isLoadingDebt ? '...' : pendingDebts.length}
+              </span>
               <h3>Cuentas<br/>Pendientes</h3>
             </div>
           </div>
@@ -139,7 +265,7 @@ const DashboardUser = () => {
 
       {/* --- MODALES --- */}
 
-      {/* Modal 1: Lista de Cuentas Pendientes (Simplificado) */}
+      {/* Modal 1: Lista de Cuentas Pendientes */}
       {showPendingMenu && (
         <div className="modal-overlay" onClick={handleCloseModals}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -149,24 +275,31 @@ const DashboardUser = () => {
             </div>
             
             <div className="pending-list">
-              {pendingDebts.map(debt => (
-                <div 
-                  key={debt.id} 
-                  className="pending-list-item selected" 
-                >
-                  <div className="pending-info">
-                    <span className="pending-month">{debt.month}</span>
-                    <span className="pending-amount">${debt.amount.toFixed(2)}</span>
+              {isLoadingDebt ? (
+                <p style={{textAlign: 'center', padding: '20px', color: '#999'}}>Cargando cuentas...</p>
+              ) : pendingDebts.length === 0 ? (
+                <p style={{textAlign: 'center', padding: '20px', color: '#999'}}>No tienes cuentas pendientes.</p>
+              ) : (
+                pendingDebts.map(debt => (
+                  <div 
+                    key={debt.id} 
+                    className="pending-list-item selected" 
+                  >
+                    <div className="pending-info">
+                      <span className="pending-month">{debt.month}</span>
+                      <span className="pending-amount">${debt.amount_usd.toFixed(2)}</span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
 
             <button 
               className="modal-primary-btn" 
               onClick={handleOpenPaymentForm}
+              disabled={pendingDebts.length === 0}
             >
-              Pagar Deuda (${totalToPay.toFixed(2)})
+             Realizar Pago
             </button>
           </div>
         </div>
@@ -185,10 +318,27 @@ const DashboardUser = () => {
               <p><strong>Banco:</strong> Banesco</p>
               <p><strong>Cta:</strong> 0134-XXXX-XXXX-XXXX-XXXX</p>
               <p><strong>RIF:</strong> J-12345678-9</p>
-              <p><strong>Monto total:</strong> ${totalToPay.toFixed(2)} (Cambio BCV)</p>
+              <p><strong>Deuda total:</strong> ${totalToPay.toFixed(2)}</p>
+              <p style={{ fontSize: '0.85em', color: '#888' }}><strong>Tasa de cambio (BCV):</strong> {bcvRate} Bs/$</p>
+              <p style={{ color: '#2ecc71' }}><strong>Total estimado en Bs:</strong> {(totalToPay * bcvRate).toFixed(2)} Bs</p>
             </div>
 
             <form onSubmit={handleSubmitPayment} className="payment-form">
+              <label htmlFor="amountBsInput">Monto depositado (Bs):</label>
+              <input 
+                type="number" 
+                id="amountBsInput"
+                className="form-input" 
+                placeholder="Ej. 1095.50" 
+                value={amountBsInput}
+                onChange={(e) => setAmountBsInput(e.target.value)}
+                step="0.01"
+                min="0"
+                required
+                disabled={isSubmitting} 
+                style={{ marginBottom: '15px' }} 
+              />
+
               <label htmlFor="refInput">Número de Referencia:</label>
               <input 
                 type="text" 
@@ -198,10 +348,25 @@ const DashboardUser = () => {
                 value={reference}
                 onChange={(e) => setReference(e.target.value)}
                 required
+                disabled={isSubmitting} 
               />
+
               <div className="form-actions">
-                <button type="button" className="modal-secondary-btn" onClick={handleCloseModals}>Cancelar</button>
-                <button type="submit" className="modal-primary-btn">Enviar Pago</button>
+                <button 
+                  type="button" 
+                  className="modal-secondary-btn" 
+                  onClick={handleCloseModals}
+                  disabled={isSubmitting}
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="submit" 
+                  className="modal-primary-btn"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'Enviando...' : 'Enviar Pago'}
+                </button>
               </div>
             </form>
           </div>
@@ -218,20 +383,26 @@ const DashboardUser = () => {
             </div>
 
             <div className="history-list">
-              {paymentHistory.map(payment => (
-                <div key={payment.id} className="history-item">
-                  <div className="history-row">
-                    <span className="history-date">{payment.date}</span>
-                    <span className="history-amount">${payment.amount.toFixed(2)}</span>
+              {isLoadingHistory ? (
+                <p style={{textAlign: 'center', padding: '20px', color: '#999'}}>Cargando historial...</p>
+              ) : paymentHistory.length === 0 ? (
+                <p style={{textAlign: 'center', padding: '20px', color: '#999'}}>No hay pagos registrados.</p>
+              ) : (
+                paymentHistory.map(payment => (
+                  <div key={payment.id} className="history-item">
+                    <div className="history-row">
+                      <span className="history-date">{payment.payment_date}</span>
+                      <span className="history-amount">${payment.amount_usd.toFixed(2)}</span>
+                    </div>
+                    <div className="history-row">
+                      <span className="history-ref">Ref: {payment.receipt}</span>
+                      <span className={`history-status status-${payment.status.toLowerCase()}`}>
+                        {getStatusText(payment.status)}
+                      </span>
+                    </div>
                   </div>
-                  <div className="history-row">
-                    <span className="history-ref">Ref: {payment.ref}</span>
-                    <span className={`history-status status-${payment.status.toLowerCase()}`}>
-                      {payment.status}
-                    </span>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </div>

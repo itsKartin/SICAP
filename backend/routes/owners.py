@@ -94,3 +94,22 @@ def block_my_number(db: Session = Depends(get_db), owner=Depends(get_current_own
         raise HTTPException(status_code=503, detail="Server error, not sms sent")
 
     return {"message": "Tu número ha sido bloqueado correctamente"}
+
+
+
+    
+#bro esta es para ver cantidad de usuarios (home screen admin)
+@router.get("/stats")
+def get_owner_stats(db: Session = Depends(get_db)):
+    # Cuenta el total de usuarios en la tabla
+    total_users = db.query(Owner).count()
+
+    blocked_users = db.query(Owner).filter(Owner.status == "inactive").count()
+    
+    active_users = db.query(Owner).filter(Owner.status == "active").count()
+    
+    return {
+        "total": total_users,
+        "blocked": blocked_users,
+        "active": active_users
+    }
