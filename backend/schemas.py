@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
 from datetime import date
+from datetime import datetime
 
 #Auth route
 class LoginRequest(BaseModel): #Login /login
@@ -100,3 +101,14 @@ class VerifyPaymentResponse(BaseModel):  #Verificacion de pagos /payment-verific
 class GenerateDuesRequest(BaseModel):
     amount_usd: float
     due_date: date
+
+class IncidentCreate(BaseModel):
+    description: str
+    opened_at: datetime
+
+class IncidentOut(BaseModel):
+    id: int
+    description: str
+    opened_at: datetime
+    created_at: datetime
+    registered_by: str
