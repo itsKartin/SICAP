@@ -114,6 +114,8 @@ def paymentverify(payment_id: int, db: Session = Depends(get_db), admin=Depends(
 
     overpayment = round(remaining_credit, 2)
 
+    db.flush()
+
     pending_dues_count = db.query(func.count(MonthlyDue.id)).filter(
         MonthlyDue.owner_id == owner.id,
         MonthlyDue.status == "pending"
@@ -154,7 +156,7 @@ def generate_dues(body: GenerateDuesRequest, db: Session = Depends(get_db), admi
     today = date_type.today()
     current_month = date_type(today.year, today.month, 1)
 
-    owners = db.query(Owner).filter(Owner.status == "active").all()
+    owners = db.query(Owner).all()
 
     if not owners:
         raise HTTPException(status_code=404, detail="No hay propietarios activos")
@@ -163,21 +165,15 @@ def generate_dues(body: GenerateDuesRequest, db: Session = Depends(get_db), admi
     owners_blocked = []
 
     for owner in owners:
-        existing = db.query(MonthlyDue).filter(
-            MonthlyDue.owner_id == owner.id,
-            MonthlyDue.month == current_month
-        ).first()
-
-        if not existing:
-            new_due = MonthlyDue(
-                owner_id=owner.id,
-                amount_usd=body.amount_usd,
-                month=current_month,
-                due_date=body.due_date,
-                status="pending"
-            )
-            db.add(new_due)
-            dues_created.append(owner.id)
+        new_due = MonthlyDue(
+            owner_id=owner.id,
+            amount_usd=body.amount_usd,
+            month=current_month,
+            due_date=body.due_date,
+            status="pending"
+        )
+        db.add(new_due)
+        dues_created.append(owner.id)
 
         pending_count = db.query(func.count(MonthlyDue.id)).filter(
             MonthlyDue.owner_id == owner.id,
