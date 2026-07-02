@@ -46,6 +46,18 @@ class DebtSummary(BaseModel):
 
 #Admin routes
 
+class AdminCreate(BaseModel):
+    username: str
+    full_name: str
+    email: str
+    password: str
+
+class OwnerUpdate(BaseModel):
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    password: Optional[str] = None
+    status: Optional[str] = None
+
 class OwnerCreate(BaseModel): #Registro de propietario /newowner 
     firstname: str
     lastname: str

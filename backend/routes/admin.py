@@ -8,7 +8,7 @@ from datetime import date as date_type
 from ..database import SessionLocal
 from ..models import Admin, Owner, Payment, MonthlyDue
 from ..auth import hash_password, get_current_admin
-from ..schemas import OwnerCreate, OwnerOut, PaymentOut, VerifyPaymentResponse, GenerateDuesRequest
+from ..schemas import OwnerCreate, OwnerOut, PaymentOut, VerifyPaymentResponse, GenerateDuesRequest, AdminCreate, OwnerUpdate
 from ..services.exchange import get_rate
 from ..services.sms import block, add
 
@@ -23,6 +23,23 @@ def get_db():
         db.close()
 
 BLOCK_THRESHOLD = 3
+
+@router.post("/new-admin")
+def create_admin(body: AdminCreate, db: Session = Depends(get_db), admin=Depends(get_current_admin)):
+    existing = db.query(Admin).filter(Admin.email == body.email).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Ya existe un administrador con ese correo")
+
+    new_admin = Admin(
+        username=body.username,
+        full_name=body.full_name,
+        email=body.email,
+        password=hash_password(body.password)
+    )
+    db.add(new_admin)
+    db.commit()
+    db.refresh(new_admin)
+    return {"message": "Administrador creado correctamente", "id": new_admin.id}
 
 @router.post("/newowner")
 def createowner(owner: OwnerCreate, db: Session = Depends(get_db), admin=Depends(get_current_admin)):
@@ -42,6 +59,26 @@ def createowner(owner: OwnerCreate, db: Session = Depends(get_db), admin=Depends
     db.commit()
     db.refresh(newowner)
     return {"message": "owner created", "id": newowner.id}
+
+@router.put("/update-owner/{owner_id}")
+def update_owner(owner_id: int, body: OwnerUpdate, db: Session = Depends(get_db), admin=Depends(get_current_admin)):
+    owner = db.query(Owner).filter(Owner.id == owner_id).first()
+    if not owner:
+        raise HTTPException(status_code=404, detail="Propietario no encontrado")
+
+    if body.phone is not None:
+        owner.phone = body.phone
+    if body.email is not None:
+        owner.email = body.email
+    if body.password is not None:
+        owner.password = hash_password(body.password)
+    if body.status is not None:
+        if body.status not in ("active", "inactive"):
+            raise HTTPException(status_code=400, detail="Estado inválido, use 'active' o 'inactive'")
+        owner.status = body.status
+
+    db.commit()
+    return {"message": "Propietario actualizado correctamente"}
 
 @router.get("/ownerlist", response_model=list[OwnerOut])
 def ownerlist(db: Session = Depends(get_db), admin=Depends(get_current_admin)):
