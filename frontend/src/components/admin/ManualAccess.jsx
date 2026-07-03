@@ -1,24 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './css/ManualAccess.css';
 import { 
-  FiPlus, FiSearch, FiUser, FiCalendar, FiFileText, FiHash, FiShield, FiX
+  FiPlus, FiSearch, FiUser, FiCalendar, FiFileText, FiHash, FiClock, FiX
 } from 'react-icons/fi';
 
 const ManualAccess = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [accessLogs, setAccessLogs] = useState([]);
   
-  // Estado para el formulario (Solo Descripción según tus requerimientos)
+
   const [formData, setFormData] = useState({
-    descripcion: '',
-    usuario: ''  // <-- Nuevo campo agregado
+    descripcion: ''
   });
 
-  // Datos simulados con los campos requeridos
-  const [accessLogs, setAccessLogs] = useState([
-    { id: 1, usuario: 'Milos Stojanovic', fecha: '2026-06-27 07:30', descripcion: 'Apertura manual de portón principal', id_admin: 101 },
-    { id: 2, usuario: 'Visita (Reparación)', fecha: '2026-06-26 14:15', descripcion: 'Acceso peatonal autorizado por apto 1A', id_admin: 102 }
-  ]);
+
+  const fetchIncidents = async () => {
+    try {
+      const token = localStorage.getItem('access_token');
+      
+      const response = await fetch('http://localhost:8000/admin/incidents/list', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setAccessLogs(data);
+      } else {
+        console.error("Error al obtener los registros");
+      }
+    } catch (error) {
+      console.error("Error de red al obtener la lista de incidentes:", error);
+    }
+  };
+
+
+  useEffect(() => {
+    fetchIncidents();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -27,41 +50,30 @@ const ManualAccess = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const token = localStorage.getItem('access_token'); 
     
     const payload = {
       description: formData.descripcion,
-      // Nota: 'usuario' e 'id_admin' probablemente se tomen del contexto 
-      // del usuario autenticado en tu backend o aplicación.
+      opened_at: new Date().toISOString()
     };
 
     try {
-      // Reemplaza esta URL con el endpoint correcto de tu API FastAPI
-      const response = await fetch('http://localhost:8000/admin/manual-access', {
+      const response = await fetch('http://localhost:8000/admin/incidents/new', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(payload)
       });
 
       if (response.ok) {
-        const data = await response.json();
-        
-        // Actualizamos la tabla con los datos que retorne la BD. 
-        // Para el ejemplo, simulamos la respuesta rellenando los campos faltantes.
-        const newLog = {
-          id: data.id || accessLogs.length + 1,
-          usuario: data.usuario || 'Admin Actual', // Simulado
-          fecha: data.fecha || new Date().toISOString().slice(0, 16).replace('T', ' '), // Simulado
-          descripcion: formData.descripcion,
-          id_admin: data.id_admin || 999 // Simulado
-        };
-        
-        setAccessLogs([...accessLogs, newLog]);
-        setIsModalOpen(false); 
-        
-        setFormData({ descripcion: '' });
         alert("Acceso manual registrado con éxito");
+        setIsModalOpen(false); 
+        setFormData({ descripcion: '' });
+        
+
+        fetchIncidents(); 
       } else {
         const errorData = await response.json();
         alert(`Error al registrar: ${errorData.detail || 'Revisa los datos enviados'}`);
@@ -72,15 +84,28 @@ const ManualAccess = () => {
     }
   };
 
-  // Filtrado simple de búsqueda
+
   const filteredLogs = accessLogs.filter(log => 
-    log.descripcion.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    log.usuario.toLowerCase().includes(searchTerm.toLowerCase())
+    (log.description && log.description.toLowerCase().includes(searchTerm.toLowerCase())) || 
+    (log.registered_by && log.registered_by.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
+
+  const formatOnlyDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleDateString();
+  };
+
+  const formatOnlyTime = (dateString) => {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleTimeString(); 
+  };
 
   return (
     <div className="admin-container">
-      {/* Barra de Herramientas */}
+ 
       <div className="admin-toolbar">
         <div className="search-wrapper">
           <FiSearch className="search-icon" />
@@ -99,33 +124,39 @@ const ManualAccess = () => {
         </div>
       </div>
 
-      {/* Tabla */}
       <div className="table-responsive">
         <table className="admin-table">
           <thead>
             <tr>
               <th><div className="th-content"><FiHash /> ID</div></th>
-              <th><div className="th-content"><FiUser /> Usuario</div></th>
+              <th><div className="th-content"><FiUser /> Registrado Por</div></th>
               <th><div className="th-content"><FiCalendar /> Fecha</div></th>
               <th><div className="th-content"><FiFileText /> Descripción</div></th>
-              <th><div className="th-content"><FiShield /> ID Admin</div></th>
+              <th><div className="th-content"><FiClock /> Hora</div></th>
             </tr>
           </thead>
           <tbody>
-            {filteredLogs.map((log) => (
-              <tr key={log.id}>
-                <td>{log.id}</td>
-                <td className="col-name">{log.usuario}</td>
-                <td>{log.fecha}</td>
-                <td>{log.descripcion}</td>
-                <td>{log.id_admin}</td>
+            {filteredLogs.length > 0 ? (
+              filteredLogs.map((log) => (
+                <tr key={log.id}>
+                  <td>{log.id}</td>
+                  <td className="col-name">{log.registered_by}</td>
+                  <td>{formatOnlyDate(log.created_at)}</td>
+                  <td>{log.description}</td>
+                  <td>{formatOnlyTime(log.created_at)}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5" style={{ textAlign: 'center', padding: '1rem' }}>
+                  No se encontraron registros.
+                </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
 
-      {/* Modal para Agregar Acceso Manual */}
 
       {isModalOpen && (
         <div className="modal-overlay">
@@ -136,27 +167,7 @@ const ManualAccess = () => {
             </div>
             
             <form onSubmit={handleSubmit}>
-
-              {/* Se eliminó el form-grid para usar un diseño de 1 sola columna apropiado para 1 campo */}
-
               <div className="form-single-col">
-
-                <div className="input-group">
-      <label>Usuario</label>
-      <select 
-        name="usuario" 
-        className="form-input" 
-        value={formData.usuario} 
-        onChange={handleInputChange} 
-        required
-      >
-        <option value="" disabled>Seleccione un usuario...</option>
-        {/* Aquí idealmente mapearías tu lista de usuarios. Ejemplo estático: */}
-        <option value="Milos Stojanovic">Milos Stojanovic</option>
-        <option value="Visita">Visita (Reparación / Delivery)</option>
-        <option value="Personal Mantenimiento">Personal de Mantenimiento</option>
-      </select>
-    </div>
                 <div className="input-group">
                   <label>Descripción del Acceso</label>
                   <textarea 

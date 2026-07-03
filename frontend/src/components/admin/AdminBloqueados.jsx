@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import './css/AdminBloqueados.css';
 
-// Modal original para detalles de bloqueo
+
 const BlockDetailsModal = ({ user, isOpen, onClose, onUnblock, onKeepBlocked }) => {
   if (!isOpen || !user) return null;
 
@@ -58,7 +58,7 @@ const BlockDetailsModal = ({ user, isOpen, onClose, onUnblock, onKeepBlocked }) 
   );
 };
 
-// MODAL ACTUALIZADO: Usuarios pendientes de bloqueo con carritos y botón único
+
 const PendingBlockModal = ({ isOpen, onClose, pendingUsers, onBlockAll }) => {
   if (!isOpen) return null;
 
@@ -78,7 +78,7 @@ const PendingBlockModal = ({ isOpen, onClose, pendingUsers, onBlockAll }) => {
         <div className="pending-users-list">
           {pendingUsers.map((user) => (
             <div className="pending-user-item" key={user.id}>
-              {/* Contenedor del carrito */}
+             
               <div className="pending-avatar-wrapper">
                 <img src="/admin/car.png" alt="Car" className="pending-avatar" />
               </div>
@@ -91,7 +91,7 @@ const PendingBlockModal = ({ isOpen, onClose, pendingUsers, onBlockAll }) => {
           ))}
         </div>
 
-        {/* Botón único para bloquear a todos */}
+    
         <div className="pending-action-footer">
           <button className="btn-bloquear-todos" onClick={onBlockAll}>
             Bloquear a todos
@@ -145,17 +145,17 @@ const AdminBloqueados = () => {
     closeBlockModal();
   };
 
-  // Función para manejar el bloqueo de todos a la vez
+  
   const handleBlockAll = () => {
     console.log('Bloqueando a todos los usuarios pendientes...');
-    // Lógica para actualizar la BD
+  
     setIsPendingPanelOpen(false);
   };
 
   return (
     <div className="admin-bloqueados-container">
       
-      {/* --- COLUMNA PRINCIPAL IZQUIERDA --- */}
+
       <div className="bloqueados-main-content">
         
         <div className="bloqueados-cards-row">
@@ -205,7 +205,7 @@ const AdminBloqueados = () => {
           </div>
         </div>
 
-        {/* --- TABLA DE BLOQUEOS --- */}
+
         <div className="bloqueados-table-section">
           
           <div className="table-header-titles table-grid">
@@ -245,7 +245,6 @@ const AdminBloqueados = () => {
 
       </div>
 
-      {/* --- COLUMNA DERECHA (APELACIONES PENDIENTES) --- */}
       <div className="bloqueados-sidebar-right">
         <h3 className="apelaciones-title">Apelaciones Pendientes</h3>
         
@@ -269,7 +268,7 @@ const AdminBloqueados = () => {
         </div>
       </div>
 
-      {/* Modal original de detalles */}
+  
       <BlockDetailsModal 
         user={selectedUser} 
         isOpen={isModalOpen} 
@@ -278,7 +277,6 @@ const AdminBloqueados = () => {
         onKeepBlocked={keepBlockedUser} 
       />
 
-      {/* Nuevo modal de usuarios pendientes de bloqueo */}
       <PendingBlockModal 
         isOpen={isPendingPanelOpen} 
         onClose={() => setIsPendingPanelOpen(false)} 

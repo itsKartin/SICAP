@@ -22,7 +22,6 @@ const AdminNav = () => {
 
   const handleDownloadUsersPDF = async () => {
     try {
-      // obtener token
       const token = localStorage.getItem('access_token');
       
       const response = await fetch('http://192.168.1.109:8000/admin/owners-report/pdf', {
@@ -37,24 +36,18 @@ const AdminNav = () => {
         throw new Error(`Error del servidor: ${response.status}`);
       }
 
-      // convertir a archivo binario
       const blob = await response.blob();
-      
-      // url temporal 
       const url = window.URL.createObjectURL(blob);
       
-      // new element <a> para descargar el archivo
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', 'reporte_propietarios.pdf');
       
-      // Agregamos el link al DOM, hacemos clic y limpiamos
       document.body.appendChild(link);
       link.click();
       link.parentNode.removeChild(link);
       window.URL.revokeObjectURL(url);
       
-      // Cerramos el menú de exportación
       setIsExportOpen(false); 
       
     } catch (error) {
@@ -62,11 +55,9 @@ const AdminNav = () => {
     }
   };
 
-  // Función para conectar con POST /admin/generate-dues
   const handleGenerateDues = async () => {
-    // Pedimos los datos al usuario mediante prompts
     const amountInput = window.prompt("Ingrese el monto de la mensualidad (USD):", "5");
-    if (amountInput === null) return; // Si el usuario cancela
+    if (amountInput === null) return; 
     
     const amount = parseFloat(amountInput);
     if (isNaN(amount) || amount <= 0) {
@@ -74,10 +65,9 @@ const AdminNav = () => {
       return;
     }
 
-    // Sugerimos la fecha de hoy por defecto
     const defaultDate = new Date().toISOString().split('T')[0];
     const dueDate = window.prompt("Ingrese la fecha de vencimiento (YYYY-MM-DD):", defaultDate);
-    if (!dueDate) return; // Si el usuario cancela
+    if (!dueDate) return; 
 
     try {
       const token = localStorage.getItem('access_token');
@@ -95,22 +85,76 @@ const AdminNav = () => {
       });
 
       if (!response.ok) {
-        // Intentamos obtener el detalle del error desde el backend
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.detail || `Error del servidor: ${response.status}`);
       }
 
       const data = await response.json();
       
-      // Mostramos el resultado de la operación
       alert(`${data.message}\nDeudas creadas: ${data.dues_created}\nPropietarios bloqueados: ${data.owners_blocked.length}`);
-      
-      // Cerramos el menú
       setIsExportOpen(false); 
 
     } catch (error) {
       console.error('Hubo un problema generando la deuda:', error);
       alert(`Error al generar la deuda: ${error.message}`);
+    }
+  };
+
+
+  const handleCreateAdmin = async () => {
+
+    const fullName = window.prompt("Ingrese el nombre completo del administrador:");
+    if (fullName === null) return; 
+
+    const username = window.prompt("Ingrese el nombre de usuario:");
+    if (username === null) return;
+
+    const email = window.prompt("Ingrese el correo electrónico:");
+    if (email === null) return;
+
+
+    const password = window.prompt("Ingrese la contraseña:");
+    if (password === null) return;
+
+
+    if (!fullName || !username || !email || !password) {
+      alert("Todos los campos son obligatorios para crear un administrador.");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('access_token');
+
+      const response = await fetch('http://192.168.1.109:8000/admin/new-admin', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: username,
+          full_name: fullName,
+          email: email,
+          password: password
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || `Error del servidor: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+
+      alert(`${data.message} (ID: ${data.id})`);
+      
+
+      setIsExportOpen(false); 
+
+    } catch (error) {
+      console.error('Hubo un problema creando el administrador:', error);
+      alert(`Error: ${error.message}`);
     }
   };
 
@@ -156,10 +200,8 @@ const AdminNav = () => {
             {isExportOpen && (
               <div className="export-dropdown">
                 <button className="export-option" onClick={handleDownloadUsersPDF}>Todos los usuarios</button>
-                <button className="export-option">Todos los pagos</button>
-                <button className="export-option">Accesos manuales</button>
-                {/* Botón conectado a la función handleGenerateDues */}
                 <button className="export-option" onClick={handleGenerateDues}>Generar deuda</button>
+                <button className="export-option" onClick={handleCreateAdmin}>Nuevo Administrador</button>
               </div>
             )}
 

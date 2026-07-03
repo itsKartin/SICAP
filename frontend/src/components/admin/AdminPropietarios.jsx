@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import './css/AdminPropietarios.css';
 import { 
-  FiPlus, FiSearch, FiUser, FiAtSign, FiPhone, FiHash, FiHome, FiFileText, FiActivity, FiX
-} from 'react-icons/fi';
+  FiPlus, FiSearch, FiUser, FiAtSign, FiPhone, FiHash, FiHome, FiFileText, FiActivity, FiX, FiEdit
+} from 'react-icons/fi'; 
 
 const AdminPropietarios = () => {
-  // Estados para los filtros
+
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all'); // Nuevo estado para el select
-  
+  const [filterStatus, setFilterStatus] = useState('all');
+
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false); 
   
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -20,6 +22,15 @@ const AdminPropietarios = () => {
     apartament: '',
     piso: '',
     torre: ''
+  });
+
+
+  const [editFormData, setEditFormData] = useState({
+    id: null,
+    email: '',
+    phone: '',
+    password: '',
+    status: 'active'
   });
 
   const [propietarios, setPropietarios] = useState([]);
@@ -50,7 +61,7 @@ const AdminPropietarios = () => {
             apartament: owner.apartment,
             piso: owner.floor,
             torre: owner.tower,
-            status: owner.status || 'active', // Aseguramos un valor por defecto
+            status: owner.status || 'active',
             cuotasAcumuladas: 0 
           }));
           
@@ -71,9 +82,25 @@ const AdminPropietarios = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const handleEditInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditFormData({ ...editFormData, [name]: value });
+  };
+
+
+  const handleEditClick = (user) => {
+    setEditFormData({
+      id: user.id,
+      email: user.email,
+      phone: user.telefono,
+      password: '', 
+      status: user.status
+    });
+    setIsEditModalOpen(true);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     const token = localStorage.getItem('access_token');
     
     const payload = {
@@ -127,26 +154,69 @@ const AdminPropietarios = () => {
     }
   };
 
-  // Lógica combinada de filtrado (Búsqueda + Estatus)
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem('access_token');
+    
+  
+    const payload = {
+      email: editFormData.email,
+      phone: editFormData.phone,
+      status: editFormData.status
+    };
+    
+ 
+    if (editFormData.password.trim() !== '') {
+      payload.password = editFormData.password;
+    }
+
+    try {
+      const response = await fetch(`http://192.168.1.109:8000/admin/update-owner/${editFormData.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (response.ok) {
+  
+        setPropietarios(propietarios.map(user => 
+          user.id === editFormData.id 
+            ? { ...user, email: editFormData.email, telefono: editFormData.phone, status: editFormData.status }
+            : user
+        ));
+        
+        setIsEditModalOpen(false);
+        alert("Propietario actualizado con éxito");
+      } else {
+        const errorData = await response.json();
+        alert(`Error al actualizar: ${errorData.detail || 'Revisa los datos enviados'}`);
+      }
+    } catch (error) {
+      console.error("Error al conectar con el backend:", error);
+      alert("Error de red: No se pudo conectar con el servidor.");
+    }
+  };
+
   const filteredPropietarios = propietarios.filter(user => {
-    // 1. Verificamos si coincide con el texto de búsqueda
     const matchesSearch = 
       user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) || 
       user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.ci.includes(searchTerm);
 
-    // 2. Verificamos si coincide con el estatus seleccionado
     const matchesStatus = 
       filterStatus === 'all' || 
       (user.status && user.status.toLowerCase() === filterStatus.toLowerCase());
 
-    // El usuario debe cumplir ambas condiciones para mostrarse en la tabla
     return matchesSearch && matchesStatus;
   });
 
   return (
     <div className="admin-container">
-      {/* Barra de Herramientas */}
+  
       <div className="admin-toolbar">
         <div className="search-wrapper">
           <FiSearch className="search-icon" />
@@ -159,7 +229,6 @@ const AdminPropietarios = () => {
         </div>
 
         <div className="toolbar-right">
-          {/* Select de filtro ahora controlado por React */}
           <select 
             className="filter-select"
             value={filterStatus}
@@ -176,7 +245,7 @@ const AdminPropietarios = () => {
         </div>
       </div>
 
-      {/* Tabla */}
+      
       <div className="table-responsive">
         <table className="admin-table">
           <thead>
@@ -188,6 +257,7 @@ const AdminPropietarios = () => {
               <th><div className="th-content"><FiHome /> Apartament</div></th>
               <th><div className="th-content"><FiFileText /> Cuotas</div></th>
               <th><div className="th-content"><FiActivity /> Status</div></th>
+              <th></th> 
             </tr>
           </thead>
           <tbody>
@@ -199,15 +269,23 @@ const AdminPropietarios = () => {
                 <td>{user.ci}</td>
                 <td>{user.torre}{user.piso}{user.apartament}</td>
                 <td>{user.cuotasAcumuladas === 0 ? 'No debts' : user.cuotasAcumuladas}</td>
-                {/* Capitalizamos la primera letra del status para que se vea mejor */}
                 <td>{user.status ? user.status.charAt(0).toUpperCase() + user.status.slice(1).toLowerCase() : 'Desconocido'}</td>
+                <td>
+                  <button 
+                    className="btn-edit" 
+                    onClick={() => handleEditClick(user)}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.1rem' }}
+                  >
+                    <FiEdit />
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      {/* Modal para Agregar Propietario */}
+
       {isModalOpen && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -218,6 +296,7 @@ const AdminPropietarios = () => {
             
             <form onSubmit={handleSubmit}>
               <div className="form-grid">
+        
                 <div className="input-group">
                   <label>Nombre</label>
                   <input type="text" name="firstName" className="form-input" value={formData.firstName} onChange={handleInputChange} required />
@@ -255,6 +334,47 @@ const AdminPropietarios = () => {
               <div className="modal-actions">
                 <button type="button" className="btn-cancel" onClick={() => setIsModalOpen(false)}>Cancelar</button>
                 <button type="submit" className="btn-submit">Guardar Propietario</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+
+      {isEditModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2>Editar Propietario</h2>
+              <FiX className="close-icon" onClick={() => setIsEditModalOpen(false)} />
+            </div>
+            
+            <form onSubmit={handleEditSubmit}>
+              <div className="form-grid">
+                <div className="input-group">
+                  <label>Email</label>
+                  <input type="email" name="email" className="form-input" value={editFormData.email} onChange={handleEditInputChange} required />
+                </div>
+                <div className="input-group">
+                  <label>Teléfono</label>
+                  <input type="text" name="phone" className="form-input" value={editFormData.phone} onChange={handleEditInputChange} required />
+                </div>
+                <div className="input-group">
+                  <label>Estatus</label>
+                  <select name="status" className="form-input" value={editFormData.status} onChange={handleEditInputChange} required>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                </div>
+                <div className="input-group">
+                  <label>Nueva Contraseña</label>
+                  <input type="password" name="password" className="form-input" value={editFormData.password} onChange={handleEditInputChange} placeholder="Dejar en blanco para no cambiar" />
+                </div>
+              </div>
+
+              <div className="modal-actions">
+                <button type="button" className="btn-cancel" onClick={() => setIsEditModalOpen(false)}>Cancelar</button>
+                <button type="submit" className="btn-submit">Actualizar Propietario</button>
               </div>
             </form>
           </div>

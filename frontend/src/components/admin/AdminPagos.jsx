@@ -2,12 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { ArrowUpDown, MoreVertical, X, DollarSign, Calendar, Receipt, Activity, User } from 'lucide-react';
 import './css/AdminPagos.css';
 
-// Modal component rediseñado
 const PaymentDetailsModal = ({ payment, isOpen, onClose, onApprove, onReject }) => {
   if (!isOpen || !payment) return null;
 
-  // Adaptamos las variables para que soporte tanto los datos quemados de la tabla principal
-  // como los datos reales que vienen del backend
+
   const nombre = payment.owner_name || payment.usuario || payment.nombre;
   const monto = payment.amount_bs ? `${payment.amount_bs} bs` : payment.monto;
   const fecha = payment.payment_date || payment.fecha;
@@ -20,7 +18,7 @@ const PaymentDetailsModal = ({ payment, isOpen, onClose, onApprove, onReject }) 
           <X size={20} />
         </button>
         
-        {/* Ícono superior centrado simulando el estilo de la referencia */}
+
         <div className="modal-icon-wrapper">
           <Receipt size={32} />
         </div>
@@ -59,16 +57,15 @@ const PaymentDetailsModal = ({ payment, isOpen, onClose, onApprove, onReject }) 
 const AdminPagos = () => {
   const [selectedPayment, setSelectedPayment] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [pendientes, setPendientes] = useState([]); // Estado para guardar los pagos pendientes desde la API
+  const [pendientes, setPendientes] = useState([]); 
 
-  // Datos de ejemplo para la tabla principal
+
   const pagos = [
     { id: 1, monto: '17.1515 bs', fecha: '4 Abr 2026', recibo: 'Ref#1551', estado: 'Completado', usuario: 'Carlos Lugo' },
     { id: 2, monto: '17.1515 bs', fecha: '4 Abr 2026', recibo: 'Ref#1551', estado: 'Completado', usuario: 'Giuseppe Papa' },
     { id: 3, monto: '25.0000 bs', fecha: '5 Abr 2026', recibo: 'Ref#1552', estado: 'Pendiente', usuario: 'Ana Martínez' },
   ];
 
-  // Fetch para obtener los pagos pendientes usando el token
   useEffect(() => {
     const fetchPendientes = async () => {
       const token = localStorage.getItem('access_token');
@@ -84,7 +81,7 @@ const AdminPagos = () => {
 
         if (response.ok) {
           const data = await response.json();
-          setPendientes(data); // Guardamos la data del backend en el estado
+          setPendientes(data); 
         } else {
           console.error("Error al obtener los pagos pendientes:", response.statusText);
         }
@@ -107,11 +104,11 @@ const AdminPagos = () => {
   };
 
 const approvePayment = async (paymentId) => {
-    // 1. Obtenemos el token para la autorización
+
     const token = localStorage.getItem('access_token');
     
     try {
-      // 2. Hacemos la petición POST a la ruta de verificación
+  
       const response = await fetch(`http://192.168.1.109:8000/admin/payment-verification/${paymentId}`, {
         method: 'POST',
         headers: {
@@ -124,14 +121,14 @@ const approvePayment = async (paymentId) => {
         const data = await response.json();
         console.log("Pago verificado exitosamente:", data);
         
-        // 3. Actualizamos la lista de pendientes para que el pago desaparezca de la UI
+
         setPendientes((prevPendientes) => 
           prevPendientes.filter((pago) => pago.id !== paymentId)
         );
         
         alert("Pago verificado correctamente.");
       } else {
-        // Manejo de errores desde el backend (ej. pago ya verificado o no encontrado)
+ 
         const errorData = await response.json();
         console.error("Error al verificar el pago:", errorData.detail);
         alert(`Error: ${errorData.detail}`);
@@ -140,7 +137,7 @@ const approvePayment = async (paymentId) => {
       console.error("Error de conexión:", error);
       alert("Hubo un error de conexión al intentar verificar el pago.");
     } finally {
-      // 4. Cerramos el modal independientemente del resultado
+  
       closePaymentModal();
     }
   };
@@ -152,12 +149,11 @@ const approvePayment = async (paymentId) => {
 
   return (
     <div className="admin-pagos-container">
-      
-      {/* --- COLUMNA PRINCIPAL IZQUIERDA --- */}
+
       <div className="pagos-main-content">
         
         <div className="pagos-cards-row">
-          {/* Tarjeta 1: Recaudado */}
+  
           <div className="pagos-card card-recaudado">
             <p className="card-subtitle">Pagos recibidos</p>
             <p className="card-sub-date">2025-2026</p>
@@ -178,14 +174,14 @@ const approvePayment = async (paymentId) => {
             </div>
           </div>
 
-          {/* Tarjeta 2: Gráfico de Crecimiento del Balance */}
+
           <div className="pagos-card balance-chart-card">
             <div className="balance-header">
               <h3 className="balance-title">Pagos por verificar</h3>
               <MoreVertical size={16} color="#888" style={{ cursor: 'pointer' }} />
             </div>
             <div className="balance-info">
-              {/* Contador dinámico basado en la respuesta de la API */}
+
               <h2 className="balance-total">{pendientes.length}</h2>
               <span className="balance-badge">+5 Hoy</span>
             </div>
@@ -206,7 +202,6 @@ const approvePayment = async (paymentId) => {
           </div>
         </div>
 
-        {/* --- NUEVA TABLA DE PAGOS --- */}
         <div className="modern-table-container">
           <div className="modern-table-header">
             <div className="modern-header-cell">
@@ -249,7 +244,6 @@ const approvePayment = async (paymentId) => {
 
       </div>
 
-      {/* --- COLUMNA DERECHA (PENDIENTES - EFECTO CARRUSEL) --- */}
       <div className="pagos-sidebar-right">
         <h3 className="pendientes-title">Pendientes por verificar</h3>
         
@@ -261,7 +255,7 @@ const approvePayment = async (paymentId) => {
                   <div className="pendiente-info">
                     <img src="/admin/User.png" alt="Perfil" className="pendiente-avatar" />
                     <div className="pendiente-text">
-                      {/* Adaptado a los campos devueltos por tu backend */}
+    
                       <p className="pendiente-name">{pago.owner_name}</p>
                       <p className="pendiente-role">Apto: {pago.owner_tower}{pago.owner_floor}{pago.owner_apartment}</p>
                     </div>
@@ -280,7 +274,7 @@ const approvePayment = async (paymentId) => {
         </div>
       </div>
 
-      {/* Modal for payment details and actions */}
+    
       <PaymentDetailsModal 
         payment={selectedPayment} 
         isOpen={isModalOpen} 
