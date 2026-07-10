@@ -18,6 +18,8 @@ def send_sms(content):
       "from": SMS_NUMBER, 
       "to": GATE_NUMBER}
     response = requests.post(SMS_URL, headers=headers, data=json.dumps(payload))
+    print("SMS STATUS:", response.status_code)
+    print("SMS RESPONSE:", response.json())
     return response.json()
 
 def block(owner_phone):

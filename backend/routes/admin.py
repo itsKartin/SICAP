@@ -92,6 +92,42 @@ def blocked_owners(db: Session = Depends(get_db), admin=Depends(get_current_admi
 
 
 
+@router.post("/block-owner/{owner_id}")
+def block_owner(owner_id: int, db: Session = Depends(get_db), admin=Depends(get_current_admin)):
+    owner = db.query(Owner).filter(Owner.id == owner_id).first()
+    if not owner:
+        raise HTTPException(status_code=404, detail="Propietario no encontrado")
+    if owner.status == "inactive":
+        raise HTTPException(status_code=400, detail="El propietario ya está bloqueado")
+
+    try:
+        block(owner.phone)
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Error al enviar SMS: {str(e)}")
+
+    owner.status = "inactive"
+    db.commit()
+    return {"message": "Propietario bloqueado correctamente"}
+
+@router.post("/unblock-owner/{owner_id}")
+def unblock_owner(owner_id: int, db: Session = Depends(get_db), admin=Depends(get_current_admin)):
+    owner = db.query(Owner).filter(Owner.id == owner_id).first()
+    if not owner:
+        raise HTTPException(status_code=404, detail="Propietario no encontrado")
+    if owner.status == "active":
+        raise HTTPException(status_code=400, detail="El propietario ya está activo")
+
+    try:
+        add(owner.phone)
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Error al enviar SMS: {str(e)}")
+
+    owner.status = "active"
+    db.commit()
+    return {"message": "Propietario desbloqueado correctamente"}
+
+
+
 @router.get("/pending-payments", response_model=list[PaymentOut])
 def pending_payments(db: Session = Depends(get_db), admin=Depends(get_current_admin)):
     payments = (
@@ -117,6 +153,31 @@ def pending_payments(db: Session = Depends(get_db), admin=Depends(get_current_ad
             owner_floor=owner.floor 
         ))
     return result
+
+
+@router.get("/all-payments", response_model=list[PaymentOut])
+def all_payments(db: Session = Depends(get_db), admin=Depends(get_current_admin)):
+    payments = (
+        db.query(Payment, Owner)
+        .join(Owner, Payment.owner_id == Owner.id)
+        .order_by(Payment.payment_date.desc())
+        .all()
+    )
+
+    return [
+        PaymentOut(
+            id=payment.id,
+            owner_id=payment.owner_id,
+            amount_bs=payment.amount_bs,
+            payment_date=payment.payment_date,
+            receipt=payment.receipt,
+            status=payment.status,
+            owner_name=f"{owner.first_name} {owner.last_name}",
+            owner_apartment=owner.apartment
+        )
+        for payment, owner in payments
+    ]
+
 
 @router.post("/payment-verification/{payment_id}", response_model=VerifyPaymentResponse)
 def paymentverify(payment_id: int, db: Session = Depends(get_db), admin=Depends(get_current_admin)):
