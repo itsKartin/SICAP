@@ -113,3 +113,16 @@ def get_owner_stats(db: Session = Depends(get_db)):
         "blocked": blocked_users,
         "active": active_users
     }
+
+
+@router.get("/me")
+def get_owner_profile(db: Session = Depends(get_db), owner=Depends(get_current_owner)):
+    owner_record = db.query(Owner).filter(Owner.id == owner["id"]).first()
+    
+    if not owner_record:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    
+    return {
+        "first_name": owner_record.first_name,
+        "status": owner_record.status
+    }

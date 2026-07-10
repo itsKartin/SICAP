@@ -1,13 +1,13 @@
-/* Contenedor principal */
+
 .admin-container {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   padding: 30px;
-  background-color: #0e0e10; /* Fondo casi negro como la imagen */
-  color: #a1a1aa; /* Gris tenue por defecto para el texto */
+  background-color: #0e0e10; 
+  color: #a1a1aa;
   min-height: 100vh;
 }
 
-/* Barra de Herramientas */
+
 .admin-toolbar {
   display: flex;
   justify-content: space-between;
@@ -85,7 +85,7 @@
   opacity: 0.8;
 }
 
-/* Tabla - Estructura y Cabeceras */
+
 .table-responsive {
   width: 100%;
   overflow-x: auto;
@@ -97,7 +97,7 @@
 .admin-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px; /* Letra pequeña y elegante */
+  font-size: 13px; 
 }
 
 .admin-table th {
@@ -125,13 +125,13 @@
   cursor: pointer;
 }
 
-/* Filas y celdas */
+
 .admin-table td {
   padding: 14px 16px;
-  border-bottom: 1px solid #1f1f22; /* Borde inferior ultra sutil */
+  border-bottom: 1px solid #1f1f22;
   vertical-align: middle;
   white-space: nowrap;
-  color: #a1a1aa; /* Gris tenue */
+  color: #a1a1aa; 
 }
 
 .admin-table tbody tr {
@@ -139,29 +139,28 @@
 }
 
 .admin-table tbody tr:hover {
-  background-color: #1c1c20; /* Efecto hover tenue */
+  background-color: #1c1c20; 
 }
 
-/* Columna de nombre resaltada (como en la imagen) */
+
 .col-name {
-  color: #f4f4f5 !important; /* Blanco para destacar el nombre */
+  color: #f4f4f5 !important; 
   font-weight: 500;
 }
 
 
-/* --- Estilos del Modal --- */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.75); /* Fondo oscuro translúcido */
+  background-color: rgba(0, 0, 0, 0.75); 
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  backdrop-filter: blur(2px); /* Efecto difuminado profesional */
+  backdrop-filter: blur(2px); 
 }
 
 .modal-content {
@@ -172,7 +171,7 @@
   max-width: 600px;
   padding: 24px;
   box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-  box-sizing: border-box; /* NUEVO: Evita que el padding expanda el modal más allá de su ancho máximo */
+  box-sizing: border-box; 
 }
 
 .modal-header {
@@ -200,7 +199,7 @@
   color: #f4f4f5;
 }
 
-/* Cuadrícula del formulario para alinear inputs */
+
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -211,7 +210,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  width: 100%; /* NUEVO: Asegura que el contenedor del input no se desborde */
+  width: 100%; 
 }
 
 .input-group label {
@@ -228,8 +227,8 @@
   font-size: 14px;
   outline: none;
   transition: border-color 0.2s;
-  width: 100%; /* NUEVO: Obliga al input a tomar exactamente el ancho de su columna */
-  box-sizing: border-box; /* NUEVO: Asegura que el borde y padding se calculen hacia adentro, no hacia afuera */
+  width: 100%; 
+  box-sizing: border-box;
 }
 
 .form-input:focus {

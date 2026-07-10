@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './css/AdminPropietarios.css';
 import { 
-  FiPlus, FiSearch, FiUser, FiAtSign, FiPhone, FiHash, FiHome, FiFileText, FiActivity, FiX, FiEdit
+  FiPlus, FiSearch, FiUser, FiAtSign, FiPhone, FiHash, FiHome, FiActivity, FiX, FiEdit
 } from 'react-icons/fi'; 
 
 const AdminPropietarios = () => {
@@ -255,7 +255,6 @@ const AdminPropietarios = () => {
               <th><div className="th-content"><FiPhone /> Teléfono</div></th>
               <th><div className="th-content"><FiHash /> C.I.</div></th>
               <th><div className="th-content"><FiHome /> Apartament</div></th>
-              <th><div className="th-content"><FiFileText /> Cuotas</div></th>
               <th><div className="th-content"><FiActivity /> Status</div></th>
               <th></th> 
             </tr>
@@ -268,7 +267,6 @@ const AdminPropietarios = () => {
                 <td>{user.telefono}</td>
                 <td>{user.ci}</td>
                 <td>{user.torre}{user.piso}{user.apartament}</td>
-                <td>{user.cuotasAcumuladas === 0 ? 'No debts' : user.cuotasAcumuladas}</td>
                 <td>{user.status ? user.status.charAt(0).toUpperCase() + user.status.slice(1).toLowerCase() : 'Desconocido'}</td>
                 <td>
                   <button 

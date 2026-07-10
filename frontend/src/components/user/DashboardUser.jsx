@@ -3,41 +3,74 @@ import { Zap, MapPin, MoreHorizontal, Wallet, CircleCheck } from 'lucide-react';
 import './DashboardUser.css';
 
 const DashboardUser = () => {
-  // Estado para controlar si el usuario está activo o inactivo
-  const [isActive, setIsActive] = useState(false);
 
-  // Estados para controlar los modales
+  const [isActive, setIsActive] = useState(false);
+  
+ 
+  const [firstName, setFirstName] = useState('');
+
+  
   const [showPendingMenu, setShowPendingMenu] = useState(false);
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [showPaymentsHistory, setShowPaymentsHistory] = useState(false);
   
-  // --- NUEVOS ESTADOS PARA EL PROTOCOLO SOS ---
+  
   const [isSosActive, setIsSosActive] = useState(false);
   const [showSosConfirm, setShowSosConfirm] = useState(false);
   const [isBlocking, setIsBlocking] = useState(false);
   
-  // Estados para el formulario de pago
+  
   const [reference, setReference] = useState('');
   const [amountBsInput, setAmountBsInput] = useState(''); 
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // Tasa BCV (Se inicializa por defecto pero se actualizará con el backend)
+  
   const [bcvRate, setBcvRate] = useState(36.5); 
 
-  // --- ESTADOS PARA LAS DEUDAS PENDIENTES ---
+ 
   const [pendingDebts, setPendingDebts] = useState([]);
   const [isLoadingDebt, setIsLoadingDebt] = useState(false);
 
-  // --- ESTADOS PARA EL HISTORIAL DE PAGOS ---
+ 
   const [paymentHistory, setPaymentHistory] = useState([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
-  // Efecto para cargar las deudas automáticamente al entrar al Dashboard
+ 
   useEffect(() => {
+    fetchUserProfile(); 
     fetchDebtSummary();
   }, []);
 
-  // Función para llamar a la API y traer las deudas pendientes
+
+  const fetchUserProfile = async () => {
+    const token = localStorage.getItem('access_token');
+
+    try {
+      const response = await fetch('http://192.168.1.109:8000/owners/me', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al obtener el perfil del usuario');
+      }
+
+      const data = await response.json();
+      
+      
+      setFirstName(data.first_name);
+
+      setIsActive(data.status?.toLowerCase() === 'active'); 
+      
+    } catch (error) {
+      console.error("Error al cargar el perfil del usuario:", error);
+    }
+  };
+
+
   const fetchDebtSummary = async () => {
     setIsLoadingDebt(true);
     const token = localStorage.getItem('access_token');
@@ -68,7 +101,6 @@ const DashboardUser = () => {
     }
   };
 
-  // Función para llamar a tu API y traer los pagos
   const fetchPaymentHistory = async () => {
     setIsLoadingHistory(true);
     const token = localStorage.getItem('access_token'); 
@@ -95,9 +127,8 @@ const DashboardUser = () => {
     }
   };
 
-  // --- FUNCIONES DEL PROTOCOLO SOS ---
+
   const handleSosToggleClick = () => {
-    // Solo abre el modal si el SOS no está activo aún
     if (!isSosActive) {
       setShowSosConfirm(true);
     }
@@ -121,7 +152,6 @@ const DashboardUser = () => {
       if (response.ok) {
         setIsSosActive(true);
         setShowSosConfirm(false);
-        // Opcional: Desactivar al usuario localmente en la UI
         setIsActive(false); 
         alert(data.message || "Protocolo SOS activado con éxito."); 
       } else {
@@ -135,7 +165,6 @@ const DashboardUser = () => {
     }
   };
 
-  // Manejadores de eventos de Modales
   const handleOpenPending = () => setShowPendingMenu(true);
   
   const handleOpenPaymentForm = () => {
@@ -154,7 +183,7 @@ const DashboardUser = () => {
     setShowPendingMenu(false);
     setShowPaymentForm(false);
     setShowPaymentsHistory(false);
-    setShowSosConfirm(false); // Cierra también el de SOS si se hace clic fuera
+    setShowSosConfirm(false); 
     setReference('');
     setAmountBsInput(''); 
   };
@@ -218,7 +247,7 @@ const DashboardUser = () => {
 
   return (
     <div className="dashboard-container">
-      {/* HEADER */}
+   
       <header className="dash-header">
         <div className="logo-wrapper">
           <img src="/logo.png" alt="SICAP" className="logo-img" />
@@ -228,7 +257,6 @@ const DashboardUser = () => {
         </div>
       </header>
 
-      {/* HERO SECTION */}
       <section className="dash-hero">
         <div className="gate-display">
           <img src="/user/port.png" alt="Portón" className="gate-img" />
@@ -240,10 +268,11 @@ const DashboardUser = () => {
         </div>
       </section>
 
-      {/* PANEL DE CONTROL */}
+   
       <section className="dash-control-panel">
         <div className="panel-header">
-          <h2>Bienvenido, Giuseppe</h2>
+       
+          <h2>Bienvenido, {firstName || 'Usuario'}</h2>
           <MoreHorizontal className="dots-icon" />
         </div>
 
@@ -272,7 +301,6 @@ const DashboardUser = () => {
             Ver mis Pagos
           </button>
 
-          {/* NUEVO BOTÓN SOS CON SLIDER */}
           <div className="action-btn sos-btn" onClick={handleSosToggleClick}>
             <div className="sos-label-col">
               <span className="sos-text">SOS</span>
@@ -283,28 +311,10 @@ const DashboardUser = () => {
           </div>
         </div>
 
-        {/* NOTIFICACIONES */}
-        <div className="notifications-container">
-          <div className="notif-item">
-            <div className="notif-icon-col">
-              <div className="notif-icon-wrapper">
-                <CircleCheck className="small-icon check-icon" />
-              </div>
-            </div>
-            <div className="notif-content">
-              <div className="notif-header">
-                <span className="notif-title">Admin</span>
-                <span className="notif-time">6:07 pm</span>
-              </div>
-              <p className="notif-desc">Pago #4515 Acreditado</p>
-            </div>
-          </div>
-        </div>
+   
       </section>
 
-      {/* --- MODALES --- */}
 
-      {/* Modal 1: Lista de Cuentas Pendientes */}
       {showPendingMenu && (
         <div className="modal-overlay" onClick={handleCloseModals}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -344,7 +354,7 @@ const DashboardUser = () => {
         </div>
       )}
 
-      {/* Modal 2: Formulario de Pago */}
+
       {showPaymentForm && (
         <div className="modal-overlay" onClick={handleCloseModals}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -412,7 +422,7 @@ const DashboardUser = () => {
         </div>
       )}
 
-      {/* Modal 3: Historial de Pagos */}
+  
       {showPaymentsHistory && (
         <div className="modal-overlay" onClick={handleCloseModals}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -447,7 +457,7 @@ const DashboardUser = () => {
         </div>
       )}
 
-      {/* Modal 4: CONFIRMACIÓN SOS */}
+  
       {showSosConfirm && (
         <div className="modal-overlay" onClick={handleCloseModals}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>

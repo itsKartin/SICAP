@@ -183,7 +183,7 @@ const approvePayment = async (paymentId) => {
             <div className="balance-info">
 
               <h2 className="balance-total">{pendientes.length}</h2>
-              <span className="balance-badge">+5 Hoy</span>
+      
             </div>
             <div className="balance-chart-container">
               <svg viewBox="0 0 400 120" preserveAspectRatio="none" className="balance-svg">
