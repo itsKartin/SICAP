@@ -1,7 +1,3 @@
-/* Contenedor principal de toda la vista */
-
-
-
 .admin-layout {
   display: flex;
   flex-direction: column;
@@ -10,14 +6,12 @@
   font-family: system-ui, -apple-system, sans-serif;
 }
 
-/* Área central que contiene la barra lateral y el contenido principal */
 .admin-content {
   display: flex;
   flex: 1;
   overflow: hidden;
 }
 
-/* Barra de navegación lateral (Ajustado el ancho a 220px) */
 .admin-sidebar {
   width: 220px; 
   background-color: #111111;
@@ -28,24 +22,22 @@
   padding: 2.5rem 1.5rem;
 }
 
-/* Lista de navegación */
 .nav-list {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem; /* Reducido el espacio entre items */
+  gap: 1.25rem;
 }
 
-/* Enlaces de navegación */
 .nav-link {
   display: flex;
   align-items: center;
   gap: 0.8rem;
   text-decoration: none;
   color: inherit;
-  font-size: 0.85rem; /* Letra un poco más pequeña */
+  font-size: 0.85rem;
   transition: color 0.2s ease-in-out;
 }
 
@@ -58,13 +50,12 @@
   font-weight: 500;
 }
 
-/* Botón de Exportar */
 .export-btn {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  padding: 0.4rem 0.8rem; /* Botón más compacto */
+  padding: 0.4rem 0.8rem;
   background-color: #222222;
   color: #ffffff;
   border-radius: 1rem;
@@ -94,15 +85,13 @@
   justify-content: center;
 }
 
-/* Área principal */
 .admin-main {
   flex: 1;
   background-color: #000000;
 }
 
-/* Footer (Barra inferior con el logo) */
 .admin-footer {
-  height: 40px; /* Barra inferior un poco más delgada */
+  height: 40px;
   background: linear-gradient(to top, #000000, #151515);
   border-top: 1px solid #222222;
   display: flex;
@@ -112,7 +101,7 @@
 }
 
 .admin-logo {
-  height: 1.2rem; /* Logo ligeramente más pequeño */
+  height: 1.2rem;
   object-fit: contain;
   opacity: 0.9;
   transition: opacity 0.2s ease-in-out;
@@ -122,15 +111,11 @@
   opacity: 1;
 }
 
-/* --- Nuevos estilos para el Menú de Exportar --- */
-
-/* Contenedor relativo para posicionar el menú */
 .export-container {
   position: relative;
   display: inline-block;
 }
 
-/* Animación opcional para el ícono cuando el menú está abierto */
 .export-icon-wrapper {
   transition: transform 0.2s ease;
 }
@@ -138,10 +123,9 @@
   transform: rotate(45deg);
 }
 
-/* El menú desplegable flotante */
 .export-dropdown {
   position: absolute;
-  bottom: calc(100% + 10px); /* Lo posiciona justo encima del botón */
+  bottom: calc(100% + 10px);
   left: 0;
   background-color: #1a1a1a;
   border: 1px solid #333333;
@@ -150,13 +134,12 @@
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  min-width: 180px; /* Ancho mínimo para que el texto no se rompa */
+  min-width: 180px;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
   z-index: 50;
   animation: fadeIn 0.2s ease-out;
 }
 
-/* Opciones individuales dentro del menú */
 .export-option {
   background: transparent;
   border: none;
@@ -175,7 +158,6 @@
   color: #ffffff;
 }
 
-/* Animación de entrada suave */
 @keyframes fadeIn {
   from {
     opacity: 0;

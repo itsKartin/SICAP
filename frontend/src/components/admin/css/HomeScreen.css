@@ -1,23 +1,17 @@
-/* Importamos la fuente Inter desde Google Fonts para asegurar que se renderice correctamente */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
-/* Contenedor principal estructurado en Flexbox de fila */
 .home-container {
   display: flex;
-  flex-direction: row; /* Coloca el contenido principal y el panel lado a lado */
-  gap: 3rem; /* Separación entre la izquierda y el panel */
+  flex-direction: row;
+  gap: 3rem;
   height: 100vh;
-
-
   padding: 2.5rem 5rem;
   box-sizing: border-box;
   position: relative;
-  
   background-color: #0d0d0d;
   color: #ffffff;
   font-family: 'Inter', sans-serif;
 }
-
 
 .main-content {
   display: flex;
@@ -26,7 +20,6 @@
   min-width: 0; 
 }
 
-/* Cabecera: Hora y Fecha */
 .home-header {
   display: flex;
   align-items: baseline;
@@ -47,7 +40,6 @@
   margin: 0;
 }
 
-/* Fila de Estadísticas */
 .stats-row {
   display: flex;
   gap: 3.5rem;
@@ -87,7 +79,6 @@
   margin: 0;
 }
 
-
 .gate-container {
   flex: 1;
   display: flex;
@@ -99,13 +90,12 @@
 }
 
 .gate-image { 
-  max-width: 50%; /*here bro*/
+  max-width: 50%;
   object-fit: contain;
   opacity: 0.9;
   filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.5));
 }
 
-/* Sección Inferior: Información */
 .home-footer {
   display: flex;
   justify-content: space-between;
@@ -128,17 +118,13 @@
   font-weight: 500;
 }
 
-/* =========================================
-   Panel de Accesos Manuales (Lado Derecho)
-========================================= */
-
 .manual-access-panel {
   width: 310px;
   display: flex;
   flex-direction: column;
   gap: 1rem;
   z-index: 20;
-  flex-shrink: 0; /* Evita que el panel se encoja en pantallas pequeñas */
+  flex-shrink: 0;
 }
 
 .panel-header {
@@ -178,15 +164,15 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  overflow-y: auto; /* Permite hacer scroll si hay muchos autos */
+  overflow-y: auto;
   max-height: calc(100vh - 10rem); 
   padding-right: 0.5rem;
 }
 
-/* Diseño elegante de la barra de scroll para el panel */
 .access-list::-webkit-scrollbar {
   width: 4px;
 }
+
 .access-list::-webkit-scrollbar-thumb {
   background: #333;
   border-radius: 4px;
@@ -247,10 +233,6 @@
   flex-shrink: 0;
   opacity: 0.6;
 }
-
-/* =========================================
-   Modal de Accesos Manuales
-========================================= */
 
 .modal-overlay {
   position: fixed;

@@ -94,12 +94,7 @@ const HomeScreen = () => {
             <div className="stat-icon-wrapper"><Lock size={24} color="#ff3b30" /></div>
             <p className="stat-value">{stats.blocked}</p><p className="stat-label">Bloqueados</p>
           </div>
-          
-     
-          <div className="stat-item">
-            <div className="stat-icon-wrapper"><History size={24} /></div>
-            <p className="stat-value">30%</p><p className="stat-label">Pendientes</p>
-          </div>
+
         </div>
 
 
