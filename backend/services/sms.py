@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 SMS_URL="https://api.httpsms.com/v1/messages/send"
-SMS_KEY=os.getenv("SMS_API")
+SMS_KEY=os.getenv("SMS_KEY")
 SMS_NUMBER=os.getenv("PHONE_NUMBER")
 GATE_NUMBER=os.getenv("GATE_NUMBER")
 
