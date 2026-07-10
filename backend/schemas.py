@@ -85,6 +85,20 @@ class OwnerOut(BaseModel): #Lista de usuario /ownerlist
     class Config:
         from_attributes = True
 
+
+class BlockedOwner(BaseModel):
+    id: int
+    first_name: str
+    last_name: str
+    phone: str
+    apartment: str
+    floor: str
+    tower: str
+    email: str
+
+    class Config:
+        from_attributes = True
+
 class PaymentOut(BaseModel): #Lista de pagos /pending-payments 
     id: int
     owner_id: int

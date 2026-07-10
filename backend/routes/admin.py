@@ -8,7 +8,7 @@ from datetime import date as date_type
 from ..database import SessionLocal
 from ..models import Admin, Owner, Payment, MonthlyDue
 from ..auth import hash_password, get_current_admin
-from ..schemas import OwnerCreate, OwnerOut, PaymentOut, VerifyPaymentResponse, GenerateDuesRequest, AdminCreate, OwnerUpdate
+from ..schemas import OwnerCreate, OwnerOut, PaymentOut, VerifyPaymentResponse, GenerateDuesRequest, AdminCreate, OwnerUpdate, BlockedOwner
 from ..services.exchange import get_rate
 from ..services.sms import block, add
 
@@ -83,6 +83,14 @@ def update_owner(owner_id: int, body: OwnerUpdate, db: Session = Depends(get_db)
 @router.get("/ownerlist", response_model=list[OwnerOut])
 def ownerlist(db: Session = Depends(get_db), admin=Depends(get_current_admin)):
     return db.query(Owner).all()
+
+
+
+@router.get("/blocked-owners", response_model=list[BlockedOwner])
+def blocked_owners(db: Session = Depends(get_db), admin=Depends(get_current_admin)):
+    return db.query(Owner).filter(Owner.status == "inactive").all()
+
+
 
 @router.get("/pending-payments", response_model=list[PaymentOut])
 def pending_payments(db: Session = Depends(get_db), admin=Depends(get_current_admin)):
