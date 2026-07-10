@@ -146,15 +146,52 @@ const AdminNav = () => {
 
       const data = await response.json();
       
-
       alert(`${data.message} (ID: ${data.id})`);
       
-
       setIsExportOpen(false); 
 
     } catch (error) {
       console.error('Hubo un problema creando el administrador:', error);
       alert(`Error: ${error.message}`);
+    }
+  };
+
+
+  const handleManualBlock = async () => {
+    const ownerIdInput = window.prompt("Ingrese el ID del propietario a bloquear:");
+    if (ownerIdInput === null || ownerIdInput.trim() === "") return;
+
+    const ownerId = parseInt(ownerIdInput, 10);
+    if (isNaN(ownerId) || ownerId <= 0) {
+      alert("Por favor, ingrese un ID de propietario válido.");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('access_token');
+
+      const response = await fetch(`http://192.168.1.109:8000/admin/block-owner/${ownerId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || `Error del servidor: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      alert(data.message);
+      
+      setIsExportOpen(false); 
+
+    } catch (error) {
+      console.error('Hubo un problema bloqueando al propietario:', error);
+      alert(`Error al bloquear: ${error.message}`);
     }
   };
 
@@ -202,6 +239,8 @@ const AdminNav = () => {
                 <button className="export-option" onClick={handleDownloadUsersPDF}>Todos los usuarios</button>
                 <button className="export-option" onClick={handleGenerateDues}>Generar deuda</button>
                 <button className="export-option" onClick={handleCreateAdmin}>Nuevo Administrador</button>
+         
+                <button className="export-option" onClick={handleManualBlock}>Bloquear manualmente</button>
               </div>
             )}
 

@@ -9,7 +9,7 @@ const AdminBloqueados = () => {
   useEffect(() => {
     const fetchBloqueados = async () => {
       try {
-        // Buscamos el token bajo 'access_token' y si no está, probamos con 'token'
+   
         const token = localStorage.getItem('access_token') || localStorage.getItem('token'); 
         
         if (!token) {
@@ -33,7 +33,7 @@ const AdminBloqueados = () => {
 
         const data = await response.json();
         
-        // Verificamos si el backend devolvió un array antes de mapear
+      
         if (!Array.isArray(data)) {
             setBloqueados([]);
             return;
@@ -57,6 +57,43 @@ const AdminBloqueados = () => {
     fetchBloqueados();
   }, []); 
 
+
+  const handleUnblock = async (id, nombre) => {
+   
+    const confirmar = window.confirm(`¿Desea desbloquear al usuario ${nombre}?`);
+    
+    
+    if (!confirmar) return;
+
+    try {
+      const token = localStorage.getItem('access_token') || localStorage.getItem('token'); 
+      
+    
+      const response = await fetch(`http://localhost:8000/admin/unblock-owner/${id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        }
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || `Error al desbloquear: ${response.status}`);
+      }
+
+      const data = await response.json();
+      alert(data.message || "Usuario desbloqueado correctamente");
+      
+   
+      setBloqueados(prevBloqueados => prevBloqueados.filter(usuario => usuario.id !== id));
+
+    } catch (err) {
+      console.error("Error al desbloquear:", err);
+      alert(`Ocurrió un error: ${err.message}`);
+    }
+  };
+
   if (loading) {
     return (
       <div className="admin-bloqueados-container">
@@ -72,7 +109,6 @@ const AdminBloqueados = () => {
         <h1 className="admin-titulo">Usuarios bloqueados</h1>
         <div style={{ textAlign: 'center', marginTop: '20px' }}>
           <p style={{ color: '#ff4444', fontSize: '1.2rem', marginBottom: '10px' }}>{error}</p>
-          {/* Opcional: Puedes agregar un botón aquí que redirija al login */}
           <button onClick={() => window.location.href = '/login'} style={{ padding: '8px 16px', cursor: 'pointer' }}>
             Ir al Login
           </button>
@@ -90,7 +126,12 @@ const AdminBloqueados = () => {
       ) : (
         <div className="admin-grid">
           {bloqueados.map((usuario) => (
-            <div key={usuario.id} className="admin-card">
+            <div 
+              key={usuario.id} 
+              className="admin-card" 
+              onClick={() => handleUnblock(usuario.id, usuario.nombre)} 
+              style={{ cursor: 'pointer' }} 
+            >
               <img 
                 src="/admin/car-2.png" 
                 alt="Vehículo bloqueado" 

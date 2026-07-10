@@ -5,7 +5,6 @@ import './css/AdminPagos.css';
 const PaymentDetailsModal = ({ payment, isOpen, onClose, onApprove, onReject }) => {
   if (!isOpen || !payment) return null;
 
-
   const nombre = payment.owner_name || payment.usuario || payment.nombre;
   const monto = payment.amount_bs ? `${payment.amount_bs} bs` : payment.monto;
   const fecha = payment.payment_date || payment.fecha;
@@ -18,7 +17,6 @@ const PaymentDetailsModal = ({ payment, isOpen, onClose, onApprove, onReject }) 
           <X size={20} />
         </button>
         
-
         <div className="modal-icon-wrapper">
           <Receipt size={32} />
         </div>
@@ -58,39 +56,48 @@ const AdminPagos = () => {
   const [selectedPayment, setSelectedPayment] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [pendientes, setPendientes] = useState([]); 
-
-
-  const pagos = [
-    { id: 1, monto: '17.1515 bs', fecha: '4 Abr 2026', recibo: 'Ref#1551', estado: 'Completado', usuario: 'Carlos Lugo' },
-    { id: 2, monto: '17.1515 bs', fecha: '4 Abr 2026', recibo: 'Ref#1551', estado: 'Completado', usuario: 'Giuseppe Papa' },
-    { id: 3, monto: '25.0000 bs', fecha: '5 Abr 2026', recibo: 'Ref#1552', estado: 'Pendiente', usuario: 'Ana Martínez' },
-  ];
+  const [pagos, setPagos] = useState([]); 
 
   useEffect(() => {
-    const fetchPendientes = async () => {
+    const fetchData = async () => {
       const token = localStorage.getItem('access_token');
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
       
       try {
-        const response = await fetch('http://192.168.1.109:8000/admin/pending-payments', {
+ 
+        const resPendientes = await fetch('http://192.168.1.109:8000/admin/pending-payments', {
           method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
+          headers
         });
 
-        if (response.ok) {
-          const data = await response.json();
-          setPendientes(data); 
+        if (resPendientes.ok) {
+          const dataPendientes = await resPendientes.json();
+          setPendientes(dataPendientes); 
         } else {
-          console.error("Error al obtener los pagos pendientes:", response.statusText);
+          console.error("Error al obtener los pagos pendientes:", resPendientes.statusText);
         }
+
+        const resTodos = await fetch('http://192.168.1.109:8000/admin/all-payments', {
+          method: 'GET',
+          headers
+        });
+
+        if (resTodos.ok) {
+          const dataTodos = await resTodos.json();
+          setPagos(dataTodos);
+        } else {
+          console.error("Error al obtener todos los pagos:", resTodos.statusText);
+        }
+
       } catch (error) {
         console.error("Error de conexión:", error);
       }
     };
 
-    fetchPendientes();
+    fetchData();
   }, []);
 
   const openPaymentModal = (payment) => {
@@ -103,12 +110,10 @@ const AdminPagos = () => {
     setSelectedPayment(null);
   };
 
-const approvePayment = async (paymentId) => {
-
+  const approvePayment = async (paymentId) => {
     const token = localStorage.getItem('access_token');
     
     try {
-  
       const response = await fetch(`http://192.168.1.109:8000/admin/payment-verification/${paymentId}`, {
         method: 'POST',
         headers: {
@@ -121,14 +126,19 @@ const approvePayment = async (paymentId) => {
         const data = await response.json();
         console.log("Pago verificado exitosamente:", data);
         
-
+  
         setPendientes((prevPendientes) => 
           prevPendientes.filter((pago) => pago.id !== paymentId)
+        );
+   
+        setPagos((prevPagos) =>
+          prevPagos.map((pago) =>
+            pago.id === paymentId ? { ...pago, status: 'paid' } : pago
+          )
         );
         
         alert("Pago verificado correctamente.");
       } else {
- 
         const errorData = await response.json();
         console.error("Error al verificar el pago:", errorData.detail);
         alert(`Error: ${errorData.detail}`);
@@ -137,7 +147,6 @@ const approvePayment = async (paymentId) => {
       console.error("Error de conexión:", error);
       alert("Hubo un error de conexión al intentar verificar el pago.");
     } finally {
-  
       closePaymentModal();
     }
   };
@@ -147,21 +156,28 @@ const approvePayment = async (paymentId) => {
     closePaymentModal();
   };
 
+
+  const totalRecibidoBs = pagos
+    .filter(pago => pago.status === 'paid')
+    .reduce((acumulador, pago) => acumulador + parseFloat(pago.amount_bs || 0), 0);
+
+
+  const totalPagos = pagos.length;
+  const pagosVerificados = pagos.filter(pago => pago.status === 'paid').length;
+
+  const porcentajeVerificados = totalPagos > 0 ? Math.round((pagosVerificados / totalPagos) * 100) : 0;
+
   return (
     <div className="admin-pagos-container">
-
       <div className="pagos-main-content">
         
         <div className="pagos-cards-row">
-  
           <div className="pagos-card card-recaudado">
             <p className="card-subtitle">Pagos recibidos</p>
-            <p className="card-sub-date">2025-2026</p>
+            <p className="card-sub-date">Total acumulado</p>
             <div className="price-container">
-              <h2 className="card-price">$1,550.00</h2>
-              <button className="icon-btn-sort">
-                <ArrowUpDown size={14} />
-              </button>
+       
+              <h2 className="card-price">{totalRecibidoBs.toFixed(2)} bs</h2>
             </div>
             
             <div className="progress-container">
@@ -169,11 +185,11 @@ const approvePayment = async (paymentId) => {
               <div className="progress-bar-segment segment-2"></div>
               <div className="progress-bar-segment segment-3"></div>
               <div className="progress-circle">
-                <span>75%</span>
+
+                <span>{porcentajeVerificados}%</span>
               </div>
             </div>
           </div>
-
 
           <div className="pagos-card balance-chart-card">
             <div className="balance-header">
@@ -181,9 +197,7 @@ const approvePayment = async (paymentId) => {
               <MoreVertical size={16} color="#888" style={{ cursor: 'pointer' }} />
             </div>
             <div className="balance-info">
-
               <h2 className="balance-total">{pendientes.length}</h2>
-      
             </div>
             <div className="balance-chart-container">
               <svg viewBox="0 0 400 120" preserveAspectRatio="none" className="balance-svg">
@@ -213,11 +227,9 @@ const approvePayment = async (paymentId) => {
             <div className="modern-header-cell">
               <Receipt size={16} /> Recibo
             </div>
-        
             <div className="modern-header-cell">
               <User size={16} /> Usuario
             </div>
-
             <div className="modern-header-cell">
               <Activity size={16} /> Estado
             </div>
@@ -226,22 +238,19 @@ const approvePayment = async (paymentId) => {
           <div className="modern-table-body">
             {pagos.map((pago) => (
               <div className="modern-table-row" key={pago.id}>
-                <div className="modern-cell font-semibold">{pago.monto}</div>
-                <div className="modern-cell">{pago.fecha}</div>
-                <div className="modern-cell text-muted">{pago.recibo}</div>
-               
-                <div className="modern-cell font-medium">{pago.usuario}</div>
-
-                 <div className="modern-cell">
-                  <span className={`status-badge ${pago.estado === 'Completado' ? 'status-completed' : 'status-pending'}`}>
-                    {pago.estado}
+                <div className="modern-cell font-semibold">{pago.amount_bs} bs</div>
+                <div className="modern-cell">{pago.payment_date}</div>
+                <div className="modern-cell text-muted">{pago.receipt}</div>
+                <div className="modern-cell font-medium">{pago.owner_name}</div>
+                <div className="modern-cell">
+                  <span className={`status-badge ${pago.status === 'paid' ? 'status-completed' : 'status-pending'}`}>
+                    {pago.status === 'paid' ? 'Completado' : 'Pendiente'}
                   </span>
                 </div>
               </div>
             ))}
           </div>
         </div>
-
       </div>
 
       <div className="pagos-sidebar-right">
@@ -255,7 +264,6 @@ const approvePayment = async (paymentId) => {
                   <div className="pendiente-info">
                     <img src="/admin/User.png" alt="Perfil" className="pendiente-avatar" />
                     <div className="pendiente-text">
-    
                       <p className="pendiente-name">{pago.owner_name}</p>
                       <p className="pendiente-role">Apto: {pago.owner_tower}{pago.owner_floor}{pago.owner_apartment}</p>
                     </div>
@@ -274,7 +282,6 @@ const approvePayment = async (paymentId) => {
         </div>
       </div>
 
-    
       <PaymentDetailsModal 
         payment={selectedPayment} 
         isOpen={isModalOpen} 

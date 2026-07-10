@@ -12,7 +12,6 @@ const AdminPropietarios = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false); 
   
-
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -23,7 +22,6 @@ const AdminPropietarios = () => {
     piso: '',
     torre: ''
   });
-
 
   const [editFormData, setEditFormData] = useState({
     id: null,
@@ -86,7 +84,6 @@ const AdminPropietarios = () => {
     const { name, value } = e.target;
     setEditFormData({ ...editFormData, [name]: value });
   };
-
 
   const handleEditClick = (user) => {
     setEditFormData({
@@ -154,19 +151,16 @@ const AdminPropietarios = () => {
     }
   };
 
-
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('access_token');
     
-  
     const payload = {
       email: editFormData.email,
       phone: editFormData.phone,
       status: editFormData.status
     };
     
- 
     if (editFormData.password.trim() !== '') {
       payload.password = editFormData.password;
     }
@@ -182,7 +176,6 @@ const AdminPropietarios = () => {
       });
 
       if (response.ok) {
-  
         setPropietarios(propietarios.map(user => 
           user.id === editFormData.id 
             ? { ...user, email: editFormData.email, telefono: editFormData.phone, status: editFormData.status }
@@ -245,11 +238,11 @@ const AdminPropietarios = () => {
         </div>
       </div>
 
-      
       <div className="table-responsive">
         <table className="admin-table">
           <thead>
             <tr>
+              <th><div className="th-content">ID</div></th>
               <th><div className="th-content"><FiUser /> Name</div></th>
               <th><div className="th-content"><FiAtSign /> Email</div></th>
               <th><div className="th-content"><FiPhone /> Teléfono</div></th>
@@ -262,6 +255,7 @@ const AdminPropietarios = () => {
           <tbody>
             {filteredPropietarios.map((user) => (
               <tr key={user.id}>
+                <td>{user.id}</td>
                 <td className="col-name">{user.firstName} {user.lastName}</td>
                 <td>{user.email}</td>
                 <td>{user.telefono}</td>
@@ -283,7 +277,6 @@ const AdminPropietarios = () => {
         </table>
       </div>
 
-
       {isModalOpen && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -294,7 +287,6 @@ const AdminPropietarios = () => {
             
             <form onSubmit={handleSubmit}>
               <div className="form-grid">
-        
                 <div className="input-group">
                   <label>Nombre</label>
                   <input type="text" name="firstName" className="form-input" value={formData.firstName} onChange={handleInputChange} required />
@@ -337,7 +329,6 @@ const AdminPropietarios = () => {
           </div>
         </div>
       )}
-
 
       {isEditModalOpen && (
         <div className="modal-overlay">

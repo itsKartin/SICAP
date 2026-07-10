@@ -173,7 +173,9 @@ def all_payments(db: Session = Depends(get_db), admin=Depends(get_current_admin)
             receipt=payment.receipt,
             status=payment.status,
             owner_name=f"{owner.first_name} {owner.last_name}",
-            owner_apartment=owner.apartment
+            owner_apartment=owner.apartment,
+            owner_tower=owner.tower, # <-- AÑADIDO
+            owner_floor=owner.floor  # <-- AÑADIDO
         )
         for payment, owner in payments
     ]
