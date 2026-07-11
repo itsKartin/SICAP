@@ -18,32 +18,31 @@ const Auth = ({ onLoginSuccess }) => {
     e.preventDefault();
 
     try {
-      // 1. Cambiamos la URL al puerto de tu backend FastAPI (usualmente 8000)
-      // Nota: Si tu router tiene un prefijo en main.py (ej. /auth o /api), añádelo a la URL.
+
 
       const response = await fetch('http://192.168.1.109:8000/auth/token', {
-        method: 'POST', // 2. El backend espera un POST
+        method: 'POST', 
         headers: {
-          'Content-Type': 'application/json', // 3. Indicamos que enviamos JSON
+          'Content-Type': 'application/json', 
         },
         body: JSON.stringify({
           email: formData.email,
           password: formData.password
-        }) // 4. Enviamos el email y password en el cuerpo de la petición
+        }) 
       });
 
       if (response.ok) {
-        // Si el status es 200 (OK)
+        
         const data = await response.json();
         
-        // Opcional: Puedes guardar el token en localStorage para mantener la sesión
+       
         localStorage.setItem('access_token', data.access_token);
         localStorage.setItem('role', data.role);
 
-        // Pasamos los datos del usuario/token a la función padre
+        
         onLoginSuccess(data);
       } else {
-        // Si hay un error (ej. 401 Invalid credentials), FastAPI devuelve un 'detail'
+       
         const errorData = await response.json();
         setError(errorData.detail || 'Correo o contraseña incorrectos');
       }

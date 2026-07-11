@@ -36,7 +36,7 @@
   color: #ffffff;
 }
 
-/* Header & Logo */
+
 .auth-header {
   text-align: center;
   margin-bottom: 32px;
@@ -46,7 +46,7 @@
 }
 
 .auth-logo {
-  height: 38px; /* Ajusta este valor para hacer tu logo más grande o pequeño */
+  height: 38px; 
   width: auto;
   margin-bottom: 12px;
 }
@@ -58,7 +58,7 @@
   font-weight: 400;
 }
 
-/* Alertas */
+
 .auth-alert {
   padding: 12px;
   border-radius: 12px;
@@ -74,7 +74,7 @@
   border: 1px solid rgba(224, 80, 80, 0.3);
 }
 
-/* Formulario */
+
 .auth-form {
   display: flex;
   flex-direction: column;
@@ -116,7 +116,7 @@
   color: #666666;
 }
 
-/* Botón Principal */
+
 .auth-submit-btn {
   background-color: #ffffff;
   color: #000000;
