@@ -24,7 +24,7 @@ const AdminNav = () => {
     try {
       const token = localStorage.getItem('access_token');
       
-      const response = await fetch('http://192.168.1.109:8000/admin/owners-report/pdf', {
+      const response = await fetch('http://localhost:8000/admin/owners-report/pdf', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -72,7 +72,7 @@ const AdminNav = () => {
     try {
       const token = localStorage.getItem('access_token');
 
-      const response = await fetch('http://192.168.1.109:8000/admin/generate-dues', {
+      const response = await fetch('http://localhost:8000/admin/generate-dues', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -125,7 +125,7 @@ const AdminNav = () => {
     try {
       const token = localStorage.getItem('access_token');
 
-      const response = await fetch('http://192.168.1.109:8000/admin/new-admin', {
+      const response = await fetch('http://localhost:8000/admin/new-admin', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -170,7 +170,7 @@ const AdminNav = () => {
     try {
       const token = localStorage.getItem('access_token');
 
-      const response = await fetch(`http://192.168.1.109:8000/admin/block-owner/${ownerId}`, {
+      const response = await fetch(`http://localhost:8000/admin/block-owner/${ownerId}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

@@ -68,7 +68,7 @@ const AdminPagos = () => {
       
       try {
  
-        const resPendientes = await fetch('http://192.168.1.109:8000/admin/pending-payments', {
+        const resPendientes = await fetch('http://localhost:8000/admin/pending-payments', {
           method: 'GET',
           headers
         });
@@ -80,7 +80,7 @@ const AdminPagos = () => {
           console.error("Error al obtener los pagos pendientes:", resPendientes.statusText);
         }
 
-        const resTodos = await fetch('http://192.168.1.109:8000/admin/all-payments', {
+        const resTodos = await fetch('http://localhost:8000/admin/all-payments', {
           method: 'GET',
           headers
         });
@@ -114,7 +114,7 @@ const AdminPagos = () => {
     const token = localStorage.getItem('access_token');
     
     try {
-      const response = await fetch(`http://192.168.1.109:8000/admin/payment-verification/${paymentId}`, {
+      const response = await fetch(`http://localhost:8000/admin/payment-verification/${paymentId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

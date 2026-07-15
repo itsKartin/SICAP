@@ -38,7 +38,7 @@ const AdminPropietarios = () => {
       const token = localStorage.getItem('access_token');
       
       try {
-        const response = await fetch('http://192.168.1.109:8000/admin/ownerlist', {
+        const response = await fetch('http://localhost:8000/admin/ownerlist', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -113,7 +113,7 @@ const AdminPropietarios = () => {
     };
 
     try {
-      const response = await fetch('http://192.168.1.109:8000/admin/newowner', {
+      const response = await fetch('http://localhost:8000/admin/newowner', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -166,7 +166,7 @@ const AdminPropietarios = () => {
     }
 
     try {
-      const response = await fetch(`http://192.168.1.109:8000/admin/update-owner/${editFormData.id}`, {
+      const response = await fetch(`http://localhost:8000/admin/update-owner/${editFormData.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

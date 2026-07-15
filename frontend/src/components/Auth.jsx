@@ -20,7 +20,7 @@ const Auth = ({ onLoginSuccess }) => {
     try {
 
 
-      const response = await fetch('http://192.168.1.109:8000/auth/token', {
+      const response = await fetch('http://localhost:8000/auth/token', {
         method: 'POST', 
         headers: {
           'Content-Type': 'application/json', 
