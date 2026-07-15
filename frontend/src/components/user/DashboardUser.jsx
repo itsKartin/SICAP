@@ -46,7 +46,7 @@ const DashboardUser = () => {
     const token = localStorage.getItem('access_token');
 
     try {
-      const response = await fetch('http://192.168.1.109:8000/owners/me', {
+      const response = await fetch('http://localhost:8000/owners/me', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -76,7 +76,7 @@ const DashboardUser = () => {
     const token = localStorage.getItem('access_token');
 
     try {
-      const response = await fetch('http://192.168.1.109:8000/owners/my-debt', {
+      const response = await fetch('http://localhost:8000/owners/my-debt', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -106,7 +106,7 @@ const DashboardUser = () => {
     const token = localStorage.getItem('access_token'); 
 
     try {
-      const response = await fetch('http://192.168.1.109:8000/owners/my-payments', {
+      const response = await fetch('http://localhost:8000/owners/my-payments', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -139,7 +139,7 @@ const DashboardUser = () => {
     const token = localStorage.getItem('access_token'); 
     
     try {
-      const response = await fetch('http://192.168.1.109:8000/owners/block-number', { 
+      const response = await fetch('http://localhost:8000/owners/block-number', { 
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -205,7 +205,7 @@ const DashboardUser = () => {
     const token = localStorage.getItem('access_token');
 
     try {
-      const response = await fetch('http://192.168.1.109:8000/owners/upload-payment', {
+      const response = await fetch('http://localhost:8000/owners/upload-payment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
