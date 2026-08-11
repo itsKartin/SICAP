@@ -1,4 +1,7 @@
-# SICAP
+<p align="center"> <img src="frontend/public/docs/title.png" alt="SICAP" width="300"> </p>
+
+<p align="center"> <strong>Gate Access Control System</strong> </p>
+
 ## Description
 
 SICAP is a full-stack web application for managing residential monthly fees, payments, and administration in a residential condominium.
@@ -8,38 +11,42 @@ Residents can view their debts, upload payment receipts, and check their payment
 One of the main goals of the project was to connect the payment system with the condominium's physical gate system. When a resident reaches the configured debt threshold, SICAP automatically sends an SMS command to the gate system to update the resident's access status.
 
 > **Note:** The application interface is currently in Spanish.
+
 ## Screenshots
+
+### Resident Dashboard
+
+<p align="center">
+  <img src="frontend/public/docs/userdashboard.png" alt="Resident Dashboard" width="75%">
+</p>
+
+### Administrator Dashboard
+
+<p align="center">
+  <img src="frontend/public/docs/admindashboard.png" alt="Administrator Dashboard" width="75%">
+</p>
+
+### Payment Verification
+
+<p align="center">
+  <img src="frontend/public/docs/adminpayment.png" alt="Payment Verification" width="75%">
+</p>
 
 ## Key Features
 
 ### Administrators
 
-- **Dashboard:** View statistics about residents, payments, and access status.
-    
-- **Resident Management:** Create, view, and update resident information and access status.
-    
-- **Payment Verification:** Review and approve or reject submitted payment receipts.
-    
-- **Automatic & Manual Access Control:** Residents can be automatically blocked when they reach the configured debt threshold, while administrators can also manually block or unblock residents.
-    
-- **Monthly Dues:** Generate monthly dues for all residents with a specified amount and due date.
-    
-- **Reports:** Generate PDF reports containing resident information.
-    
-- **Access Logs:** Record and review manual gate access incidents.
-    
+* **Dashboard & Resident Management:** Monitor residents, payment status, debt, and access status.
+* **Payment Management:** Review submitted payments and generate monthly dues.
+* **Access Control:** Automatically or manually block and unblock residents.
+* **Reports & Logs:** Generate PDF reports and keep track of manual access incidents.
 
 ### Residents
 
-- **Dashboard:** View current access status and financial summary.
-    
-- **Debt Management:** View pending monthly dues, total debt in USD and Bs, and the current exchange rate.
-    
-- **Payment Submission:** Submit payment information and upload proof of payment.
-    
-- **Payment History:** View previously submitted payments and their status.
-    
-- **SOS Protocol:** Immediately block the resident's phone number from accessing the gate in case of an emergency or vehicle theft.
+* **Dashboard:** View access status, outstanding debt, exchange rate, and payment history.
+* **Payment Submission:** Upload payment receipts and submit transaction information.
+* **SOS Protocol:** Immediately block their phone number from the gate system in case of an emergency or vehicle theft.
+
     
 
 ## Workflow
